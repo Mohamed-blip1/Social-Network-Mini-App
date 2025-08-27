@@ -1,5 +1,7 @@
 #pragma once
 #include <iostream>
+#include <iomanip>
+#include <algorithm>
 
 std::string trim(const std::string &str, char target = ' ')
 {
@@ -14,7 +16,7 @@ std::string trim(const std::string &str, char target = ' ')
 
 namespace utils
 {
-    inline std::string get_name(const std::string &UI)
+    inline std::string get_valid_string_from_user(const std::string &UI) noexcept
     {
         std::string name;
         do
@@ -30,22 +32,35 @@ namespace utils
         return name;
     }
 
-    void menu()
+    void menu() noexcept
     {
+        constexpr size_t space = 2;
         std::cout << "\n===== Social Network Menu =====\n";
-        std::cout << "1 - Login\n";
-        std::cout << "2 - Sign-up\n";
-        std::cout << "0 - Exit\n";
+        std::cout << std::setw(space) << std::left << "1" << "- Login\n";
+        std::cout << std::setw(space) << std::left << "2" << "- Sign-up\n";
+        std::cout << std::setw(space) << std::left << "0" << "- Exit\n";
     }
-    void user_menu()
+    void user_menu() noexcept
     {
+
+        constexpr size_t space = 3;
+
         std::cout << "\n---- User Menu ----\n";
-        std::cout << "1 - Add friend\n";
-        std::cout << "2 - Friends suggestions\n";
-        std::cout << "0 - Logout\n";
+        std::cout << std::setw(space) << std::left << "1" << "- Add friend\n";
+        std::cout << std::setw(space) << std::left << "2" << "- Recent messages\n";
+        std::cout << std::setw(space) << std::left << "3" << "- Send message\n";
+        std::cout << std::setw(space) << std::left << "4" << "- Notifications\n";
+        std::cout << std::setw(space) << std::left << "5" << "- Show friends\n";
+        std::cout << std::setw(space) << std::left << "6" << "- Friends-of-friends suggestions\n";
+        std::cout << std::setw(space) << std::left << "7" << "- Friends suggestions\n";
+        std::cout << std::setw(space) << std::left << "8" << "- recent actions\n";
+        std::cout << std::setw(space) << std::left << "9" << "- Clear Messages\n";
+        std::cout << std::setw(space) << std::left << "10" << "- Clear Notifications\n";
+        std::cout << std::setw(space) << std::left << "11" << "- Remove friend\n";
+        std::cout << std::setw(space) << std::left << "0" << "- Logout\n";
     }
 
-    size_t get_valid_number_from_user()
+    size_t get_valid_number_from_user() noexcept
     {
         size_t number;
         while (true)
