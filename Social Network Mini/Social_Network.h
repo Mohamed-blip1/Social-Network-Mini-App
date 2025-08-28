@@ -7,6 +7,8 @@
 #include <iomanip>
 #include "user.h"
 
+//
+
 constexpr size_t USERS_EXPECTED = 100;
 constexpr float GROW_BY = 1.5;
 
@@ -283,4 +285,5 @@ private:
     std::unordered_set<std::string> users_set_;
     std::vector<std::string> users_vec_;
     std::deque<std::string> bfs_;
+
 };
