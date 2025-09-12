@@ -1,14 +1,13 @@
-#include <iostream>
-#include "Social_Network.h"
-#include "utils.h"
-#include <iomanip>
+// main.cpp
+#include "user_menu.h"
 
 int main()
 {
     Network network;
 
     size_t choice;
-
+    std::string user_name;
+    std::string password;
     do
     {
         utils::menu();
@@ -22,143 +21,32 @@ int main()
             break;
 
         case 1:
+        {
             // Login:
+            user_name = utils::get_valid_string_from_user("Enter Your Name: ");
+            password = utils::get_valid_string_from_user("Enter Your Password: ");
+            try
             {
-                std::string user_name = utils::get_valid_string_from_user("Enter Your Name: ");
-
-                if (!network.Login(user_name))
-                {
-                    std::cout << "No account found. Please sign up to create a new account.\n";
-                    break;
-                }
-
-                // user space.
-                std::cout << "Welcome back " << user_name << "!\n";
-                do
-                {
-                    utils::user_menu();
-                    choice = utils::get_valid_number_from_user();
-                    std::cout << "\n";
-                    switch (choice)
-                    {
-                    case 0:
-                        // logout
-                        std::cout << "Goodbye!\n";
-                        break;
-
-                    case 1:
-                    {
-                        std::string other = utils::get_valid_string_from_user("Enter a Name: ");
-
-                        try
-                        {
-                            network.add_friendship(user_name, other);
-                            std::cout << "You and '" << other << "' are friends now.\n";
-                        }
-                        catch (const std::exception &e)
-                        {
-                            std::cout << "Error: " << e.what() << "\n";
-                        }
-                    }
-                    break;
-
-                    case 2:
-                        if (!network.show_messages(user_name))
-                            std::cout << "No messages received yet!\n";
-                        break;
-
-                    case 3:
-                    {
-                        std::string other = utils::get_valid_string_from_user("Enter a Name: ");
-
-                        if (!network.check_if_user_exist(other))
-                        {
-                            std::cout << "No account found!\n";
-                            break;
-                        }
-
-                        else
-                        {
-                            std::string message = utils::get_valid_string_from_user("Enter a message: ");
-
-                            network.send_message(user_name, other, message);
-                            std::cout << "Message sent.\n";
-                        }
-
-                        break;
-                    }
-
-                    case 4:
-                        if (!network.notifications(user_name))
-                            std::cout << "Empty notifications!\n";
-                        break;
-
-                    case 5:
-                        if (!network.show_friends(user_name))
-                            std::cout << "No friends yet!\n";
-                        break;
-                    case 6:
-                        if (!network.bfs(user_name))
-                            std::cout << "No friends-of-friends yet!\n";
-                        break;
-                    case 7:
-                        if (!network.Friends_suggestions(user_name))
-                            std::cout << "There are no friend suggestions!\n";
-                        break;
-
-                    case 8:
-                        if (!network.recent_actions(user_name))
-                            std::cout << "No recent actions!\n";
-                        break;
-
-                    case 9:
-                        network.clear_messages(user_name);
-                        std::cout << "Messages have been cleared!\n";
-                        break;
-
-                    case 10:
-                        network.clear_notifications(user_name);
-                        std::cout << "Notifications have been cleared!\n";
-                        break;
-
-                    case 11:
-                    {
-                        std::string other = utils::get_valid_string_from_user("Enter a Name: ");
-
-                        try
-                        {
-                            network.remove_friendship(user_name, other);
-                            std::cout << "You and '" + other + "' are no longer friends!\n";
-                        }
-                        catch (const std::exception &e)
-                        {
-                            std::cout << "Error: " << e.what() << "\n";
-                        }
-                    }
-                    break;
-
-                    default:
-                        std::cout << "'" << choice << "' Is not a choice!\n";
-                    }
-
-                } while (choice);
-                choice++;
-                break;
+                user_menu(network, user_name, password);
             }
-
+            catch (const std::exception &e)
+            {
+                std::cout << "Error: " << e.what() << "\n";
+            }
+            break;
+        }
         case 2:
             // Sign-up:
-            {
-                std::string name = utils::get_valid_string_from_user("Enter Your Name: ");
+            user_name = utils::get_valid_string_from_user("Enter Your Name: ");
+            password = utils::get_valid_string_from_user("Enter Your Password: ");
 
-                if (!network.sign_up(name))
-                    std::cout << "The account already exists. Please log in.\n";
-                else
-                    // inter user space.
-                    std::cout << "Welcome '" << name << "'. Please log in to access your account.\n";
+            if (!network.sign_up(user_name, password))
+                std::cout << "Username already exists!\n";
+            else
+                // Enter user space.
+                std::cout << "Welcome '" << user_name << "'. Please log in to access your account.\n";
 
-                break;
-            }
+            break;
 
         default:
             std::cout << "'" << choice << "' Is not a choice!\n";

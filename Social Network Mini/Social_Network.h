@@ -1,3 +1,4 @@
+// Social_Network.h
 #pragma once
 #include <iostream>
 #include <vector>
@@ -22,6 +23,9 @@ constexpr size_t LIMITS = 10;
 class Network
 {
 public:
+    using system_clock = std::chrono::system_clock;
+
+public:
     // tuning
     Network() noexcept
     {
@@ -33,27 +37,30 @@ public:
         users_set_.max_load_factor(0.7);
 
         users_vec_.reserve(USERS_EXPECTED * GROW_BY);
+        new_day_ = true;
     }
 
 public:
-    bool Login(const std::string &name) noexcept
+    // Use Error handling (try/catch)!!!!!!
+    void Login(const std::string &name, const std::string &password)
     {
         // if Not exist
         if (!users_set_.count(name))
-            return false;
+            throw std::runtime_error("Username not found!");
 
-        return true;
+        if (!user_info_.at(name).verify_password(password))
+            throw std::runtime_error("Incorrect password!");
     }
 
-    bool sign_up(const std::string &name) noexcept
+    bool sign_up(const std::string &name, const std::string &password) noexcept
     {
         // if exist
         if (users_set_.count(name))
             return false;
 
-        user_info_[name];
         users_set_.emplace(name);
         users_vec_.emplace_back(name);
+        user_info_[name].set_password(password);
 
         return true;
     }
@@ -94,17 +101,26 @@ public:
         user_info_[name].unfriend(user);
         user_info_[name].set_notifications().push_front("You and '" + user + "' are no longer friends!");
     }
-
-    //
+    //////////////////////////////////////////////////////////// Under Updates
     void send_message(const std::string &user, const std::string &name, const std::string &message)
     {
+        auto time = system_clock::now();
+        std::time_t tt = system_clock::to_time_t(time);
+        std::tm tm = *std::localtime(&tt);
+        std::ostringstream oss;
+
+        if (user != name)
+            user_info_[user].new_day(oss, tm, time);
+        user_info_[name].new_day(oss, tm, time);
+
+        oss << std::put_time(&tm, "%H:%M");
         if (user == name)
-            user_info_[name].set_messages().push_front("you: " + message);
+            user_info_[name].set_messages().push_front(oss.str() + " [you]: " + message);
 
         else
         {
-            user_info_[name].set_messages().push_front("From '" + user + "': " + message);
-            user_info_[user].set_messages().push_front("To ->'" + name + "': " + message);
+            user_info_[name].set_messages().push_front(oss.str() + " [" + user + "]: " + message);
+            user_info_[user].set_messages().push_front(oss.str() + " [->" + name + "]: " + message);
         }
     }
 
@@ -283,4 +299,5 @@ private:
     std::unordered_set<std::string> users_set_;
     std::vector<std::string> users_vec_;
     std::deque<std::string> bfs_;
+    bool new_day_;
 };
