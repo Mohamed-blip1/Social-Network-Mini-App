@@ -20,6 +20,20 @@ constexpr size_t LIMITS_TAKING = 4;
 
 constexpr size_t LIMITS = 10;
 
+struct Time
+{
+    using system_clock = std::chrono::system_clock;
+    system_clock::time_point now_time;
+    std::time_t tt;
+    std::tm tm;
+    Time()
+    {
+        now_time = system_clock::now();
+        tt = system_clock::to_time_t(now_time);
+        tm = *std::localtime(&tt);
+    }
+};
+
 class Network
 {
 public:
@@ -70,6 +84,9 @@ public:
 
     void add_friendship(const std::string &user, const std::string &name)
     {
+        Time time;
+        std::ostringstream oss;
+        oss << std::put_time(&time.tm, "%Y-%m-%d %H:%M");
 
         if (!users_set_.count(name))
             throw std::runtime_error("No account found!");
@@ -83,11 +100,15 @@ public:
         // add friendship on bout users
         // and send a notification to the other user (He can remove)
         user_info_[name].add_friend(user);
-        user_info_[name].set_notifications().push_front("You and '" + user + "' are friends now!");
+        user_info_[name].set_notifications().push_front(oss.str() + " :You and [" + user + "] are friends now!");
+        user_info_[user].set_notifications().push_front(oss.str() + " :You and [" + name + "] are friends now!");
     }
 
     void remove_friendship(const std::string &user, const std::string &name)
     {
+        Time time;
+        std::ostringstream oss;
+        oss << std::put_time(&time.tm, "%Y-%m-%d %H:%M");
 
         if (!users_set_.count(name))
             throw std::runtime_error("No account found!");
@@ -99,21 +120,20 @@ public:
             throw std::runtime_error("'" + name + "' is not your friend!");
 
         user_info_[name].unfriend(user);
-        user_info_[name].set_notifications().push_front("You and '" + user + "' are no longer friends!");
+        user_info_[name].set_notifications().push_front(oss.str() + " :You and [" + user + "] are no longer friends!");
+        user_info_[user].set_notifications().push_front(oss.str() + " :You and [" + name + "] are no longer friends!");
     }
-    //////////////////////////////////////////////////////////// Under Updates
+    
     void send_message(const std::string &user, const std::string &name, const std::string &message)
     {
-        auto time = system_clock::now();
-        std::time_t tt = system_clock::to_time_t(time);
-        std::tm tm = *std::localtime(&tt);
+        Time time;
         std::ostringstream oss;
 
         if (user != name)
-            user_info_[user].new_day(oss, tm, time);
-        user_info_[name].new_day(oss, tm, time);
+            user_info_[user].new_day(oss, time.tm, time.now_time);
+        user_info_[name].new_day(oss, time.tm, time.now_time);
 
-        oss << std::put_time(&tm, "%H:%M");
+        oss << std::put_time(&time.tm, "%H:%M");
         if (user == name)
             user_info_[name].set_messages().push_front(oss.str() + " [you]: " + message);
 

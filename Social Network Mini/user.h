@@ -32,7 +32,8 @@ public:
 
 public:
     // Add time
-    bool add_friend(const std::string &name) noexcept
+    bool add_friend(const std::string &name, std::ostringstream &oss,
+                    const std::tm &tm, const system_clock::time_point &tp) noexcept
     {
         // if exist
         if (friends_set.count(name))
@@ -46,6 +47,9 @@ public:
         if (latest_5_.size() >= MAX_RECENT)
             latest_5_.pop_back();
 
+        ////////////////////////// Under updates
+
+        // latest_5_.push_front(name + Here the time of action);
         latest_5_.push_front(name);
 
         return true;
