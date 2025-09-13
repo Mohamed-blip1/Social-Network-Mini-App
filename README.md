@@ -65,14 +65,14 @@ g++ -std=c++17 -Iinclude -Isrc src/*.cpp main.cpp -o main.exe
 📌 Example Usage
 
 Once running, you’ll see a menu like this:
-
+```
 ===== Social Network Menu =====
 1 - Login
 2 - Sign-up
 3 - Menu
 0 - Exit
 >
-
+```
 
 You can:
 
