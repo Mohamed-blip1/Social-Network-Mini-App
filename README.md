@@ -17,22 +17,23 @@ It allows users to sign up, log in, post messages, and interact with each other 
 
 📁 Project Structure
 Social-Network-Mini-App/
-| Social_Network_Mini/
-| ├── include/                # Header files
-| │   ├── user.h              # User class definition
-| │   ├── user_menu.h         # User interface logic
-| │   ├── social_network.h    # Core network logic
-| │   └── utils.h             # Utility functions
-| │
-| ├── src/                    # Implementation files
-| │   ├── user.cpp
-| │   ├── user_menu.cpp
-| │   ├── social_network.cpp
-| │   └── utils.cpp
-| ├── main.cpp                # Program entry point
-| └── Makefile                # Build configuration
 ├── .gitignore
-└── README.md               # This file
+├── README.md # This file
+└── Social_Network_Mini/
+├── include/ # Header files
+│ ├── user.h # User class
+│ ├── user_menu.h # User interface logic
+│ ├── social_network.h # Core logic
+│ └── utils.h # Utilities
+│
+├── src/ # Source files
+│ ├── user.cpp
+│ ├── user_menu.cpp
+│ ├── social_network.cpp
+│ └── utils.cpp
+│
+├── main.cpp # Program entry point
+└── Makefile # Build configuration
 
 ⚙️ Build Instructions
 🛠 Prerequisites
