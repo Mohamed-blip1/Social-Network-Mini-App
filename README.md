@@ -15,6 +15,7 @@ It allows users to sign up, log in, post messages, and interact with each other 
 
 💾 Simple data handling via memory (no database)
 
+```
 📁 Project Structure
 Social-Network-Mini-App/
 ├── .gitignore
@@ -34,6 +35,7 @@ Social-Network-Mini-App/
 
     ├── main.cpp              # Program entry point
     └── Makefile              # Build configuration
+```
 
 ⚙️ Build Instructions
 🛠 Prerequisites
