@@ -8,9 +8,9 @@ int main()
     size_t choice;
     std::string user_name;
     std::string password;
-    do
+    utils::menu();
+    while (choice != 0)
     {
-        utils::menu();
         choice = utils::get_valid_number_from_user();
         std::cout << "\n";
         switch (choice)
@@ -47,11 +47,14 @@ int main()
                 std::cout << "Welcome '" << user_name << "'. Please log in to access your account.\n";
 
             break;
+        case 3:
+            utils::menu();
+            break;
 
         default:
             std::cout << "'" << choice << "' Is not a choice!\n";
         }
-    } while (choice);
+    }
 
     return 0;
 }
