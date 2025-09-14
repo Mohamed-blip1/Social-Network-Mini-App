@@ -64,11 +64,12 @@ void user_menu(Network &network, const std::string &user_name, const std::string
                 std::string message;
                 // is that posible
                 // exiting with esc
+                message = utils::get_valid_string_from_user("Enter a message (or type 'esc' to exit): ");
                 while (message != "esc")
                 {
-                    message = utils::get_valid_string_from_user("Enter a message (or type 'esc' to exit): ");
                     network.send_message(user_name, other, message);
                     std::cout << "Message sent.\n";
+                    message = utils::get_valid_string_from_user("Enter a message (or type 'esc' to exit): ");
                 }
             }
         }
