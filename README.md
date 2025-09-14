@@ -59,9 +59,10 @@ make
 ./main.exe  # (or ./main on Linux/macOS)
 
 ⚙️ Option 2: Manual compilation
+```
 g++ -std=c++17 -Iinclude -Isrc src/*.cpp main.cpp -o main.exe
 ./main.exe
-
+```
 📌 Example Usage
 
 Once running, you’ll see a menu like this:
