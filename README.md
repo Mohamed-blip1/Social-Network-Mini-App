@@ -53,8 +53,9 @@ A terminal or shell (Linux, macOS, Windows with MSYS2)
 cd Social_Network_Mini
 
 # Compile
+```
 make
-
+```
 # Run
 ./main.exe  # (or ./main on Linux/macOS)
 
