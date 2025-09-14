@@ -3,7 +3,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Iinclude -Isrc
 
-SRC = $(wildcard src/*.cpp)
+SRC = main.cpp $(wildcard src/*.cpp)
 OUT = main.exe
 
 all: $(OUT)
