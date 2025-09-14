@@ -1,6 +1,5 @@
 #pragma once
 // Social_Network.h
-#include <unordered_map>
 #include <random>
 #include <iomanip>
 #include "user.h"
@@ -50,22 +49,18 @@ public:
     // max friend of friend suggesting: 8
     bool bfs(const std::string &user) noexcept;
 
-    bool show_messages(const std::string &user) const noexcept;
+    bool show_messages(const std::string &user,
+                       const std::string &name) const noexcept;
     bool show_friends(const std::string &user) const noexcept;
     // show recent 5 friend actions
     bool recent_actions(const std::string &user) const noexcept;
     bool notifications(const std::string &user) const noexcept;
 
     void clear_notifications(const std::string &user) { user_info_[user].clear_notifications(); }
-    void clear_messages(const std::string &user) { user_info_[user].clear_messages(); }
+    void clear_messages(const std::string &user, const std::string &name) { user_info_[user].clear_messages(name); }
 
     // befor send message
-    bool check_if_user_exist(const std::string &user)
-    {
-        if (!users_set_.count(user))
-            return false;
-        return true;
-    }
+    bool check_if_user_exist_and_friend(const std::string &user, const std::string &name) const noexcept;
 
 private:
     // splited Fisher-Yates shuffle only for first 10 slots

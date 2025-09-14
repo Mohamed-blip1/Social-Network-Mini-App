@@ -25,6 +25,7 @@ struct MessagesInfo
     time_point time;
     std::string content;
 
+    // MessagesInfo() = default;
     MessagesInfo(const time_point &tp, const std::string &st)
         : time(tp), content(st) {}
 };

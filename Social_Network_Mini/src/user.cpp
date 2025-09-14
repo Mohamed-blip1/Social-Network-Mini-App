@@ -6,22 +6,25 @@
 UserInfo::UserInfo() noexcept
 {
 
-    friends_set.rehash(expected_friends_number * grow_by);
-    friends_set.max_load_factor(0.7);
+    friends_set_.rehash(expected_friends_number * grow_by);
+    friends_set_.max_load_factor(0.7);
+
+    boxes_.rehash(expected_friends_number * grow_by);
+    boxes_.max_load_factor(0.7);
 
     friends_vec.reserve(expected_friends_number * grow_by);
-    new_day_ = true;
     day_check = system_clock::now();
+    new_day_ = true;
 }
 
 bool UserInfo::add_friend(const std::string &name,
                           const std::ostringstream &oss) noexcept
 {
     // if exist
-    if (friends_set.count(name))
+    if (friends_set_.count(name))
         return false;
 
-    friends_set.emplace(name);
+    friends_set_.emplace(name);
 
     auto it = std::lower_bound(friends_vec.begin(), friends_vec.end(), name);
     friends_vec.emplace(it, name);
@@ -30,19 +33,21 @@ bool UserInfo::add_friend(const std::string &name,
         latest_5_.pop_back();
 
     latest_5_.emplace_front(oss.str(), name);
+    boxes_[name];
 
     return true;
 }
 
 bool UserInfo::unfriend(const std::string &name) noexcept
 {
-    auto _it = friends_set.find(name);
+    auto _it = friends_set_.find(name);
 
     // if Not exist
-    if (_it == friends_set.end())
+    if (_it == friends_set_.end())
         return false;
 
-    friends_set.erase(_it);
+    friends_set_.erase(_it);
+    boxes_.erase(name);
 
     auto it = std::lower_bound(friends_vec.begin(), friends_vec.end(), name);
     if (it != friends_vec.end() && *it == name)
@@ -91,13 +96,14 @@ bool UserInfo::display_notifications() const noexcept
     return true;
 }
 
-bool UserInfo::display_messages() const noexcept
+bool UserInfo::display_messages(const std::string &name) const noexcept
 {
-
-    if (messages_.empty())
+    // Check if friend exist
+    // Before
+    if (boxes_.at(name).empty())
         return false;
 
-    for (auto it = messages_.rbegin(); it != messages_.rend(); ++it)
+    for (auto it = boxes_.at(name).rbegin(); it != boxes_.at(name).rend(); ++it)
         std::cout << "- " << it->content << "\n";
 
     return true;
@@ -110,17 +116,19 @@ bool UserInfo::verify_password(const std::string &password) const noexcept
     return true;
 }
 
-void UserInfo::new_day(std::ostringstream &oss, Time &time) noexcept
+void UserInfo::new_day(const std::string &name, std::ostringstream &oss, Time &time) noexcept
 {
     auto duration = std::chrono::duration_cast<std::chrono::hours>(time.tp - day_check);
-    if (duration >= std::chrono::hours(DAY) || messages_.empty())
+    // Che
+    // Beforeck if friend exist
+    if (duration >= std::chrono::hours(DAY) || boxes_.at(name).empty())
         new_day_ = true;
 
     if (new_day_)
     {
         oss << std::put_time(&time.tm, "%Y-%m-%d");
 
-        messages_.emplace_front(time.tp, oss.str());
+        boxes_.at(name).emplace_front(time.tp, oss.str());
         new_day_ = false;
         oss.str("");
         oss.clear();
@@ -131,12 +139,25 @@ void UserInfo::add_notification(
     const time_point &tp,
     const std::string &str) noexcept { notifications_.emplace_front(tp, str); }
 
-void UserInfo::add_message(
-    const time_point &tp,
-    const std::string &str) noexcept { messages_.emplace_front(tp, str); }
+void UserInfo::add_message(const std::string &name,
+                           const time_point &tp,
+                           const std::string &str) noexcept { boxes_.at(name).emplace_front(tp, str); }
 
-void UserInfo::set_password(
-    const std::string &password) noexcept { password_ = password; }
+void UserInfo::set_info(
+    const std::string &name,
+    const std::string &password) noexcept
+{
+    user_name_ = name;
+    password_ = password;
+}
 
 void UserInfo::clear_notifications() noexcept { notifications_.clear(); }
-void UserInfo::clear_messages() noexcept { messages_.clear(); }
+void UserInfo::clear_messages(const std::string &name) noexcept { boxes_.at(name).clear(); }
+
+bool UserInfo::check_if_friend_exist(const std::string &name) const noexcept
+{
+    if (!friends_set_.count(name))
+        return false;
+    else
+        return true;
+}

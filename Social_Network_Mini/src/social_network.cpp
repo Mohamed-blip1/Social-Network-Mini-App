@@ -31,7 +31,8 @@ bool Network::sign_up(const std::string &name, const std::string &password) noex
 
     users_set_.emplace(name);
     users_vec_.emplace_back(name);
-    user_info_[name].set_password(password);
+    user_info_[name].set_info(name, password);
+    add_friendship(name, name);
 
     return true;
 }
@@ -46,16 +47,14 @@ void Network::add_friendship(const std::string &user, const std::string &name)
     if (!users_set_.count(name))
         throw std::runtime_error("No account found!");
 
-    if (user == name)
-        throw std::runtime_error("You can't add yourself as a friend!");
-
     if (!user_info_[user].add_friend(name, oss))
         throw std::runtime_error("Friend already exist!");
 
     // add friendship on bout users
     // and send a notification to the other user (He can remove)
     user_info_[name].add_friend(user, oss);
-    user_info_[name].add_notification(time.tp, oss.str() + " :You and [" + user + "] are friends now!");
+    if (user != name)
+        user_info_[name].add_notification(time.tp, oss.str() + " :You and [" + user + "] are friends now!");
     user_info_[user].add_notification(time.tp, oss.str() + " :You and [" + name + "] are friends now!");
 }
 
@@ -69,14 +68,12 @@ void Network::remove_friendship(const std::string &user, const std::string &name
     if (!users_set_.count(name))
         throw std::runtime_error("No account found!");
 
-    if (user == name)
-        throw std::runtime_error("You can't remove yourself!");
-
     if (!user_info_[user].unfriend(name))
         throw std::runtime_error("'" + name + "' is not your friend!");
 
     user_info_[name].unfriend(user);
-    user_info_[name].add_notification(time.tp, oss.str() + " :You and [" + user + "] are no longer friends!");
+    if (user != name)
+        user_info_[name].add_notification(time.tp, oss.str() + " :You and [" + user + "] are no longer friends!");
     user_info_[user].add_notification(time.tp, oss.str() + " :You and [" + name + "] are no longer friends!");
 }
 
@@ -87,19 +84,20 @@ void Network::send_message(const std::string &user, const std::string &name, con
     time.tm = *std::localtime(&time.tt);
 
     if (user != name)
-        user_info_[user].new_day(oss, time);
-    user_info_[name].new_day(oss, time);
+        user_info_[user].new_day(name, oss, time);
+    user_info_[name].new_day(user, oss, time);
 
     oss << std::put_time(&time.tm, "%H:%M");
     if (user == name)
-        user_info_[name].add_message(time.tp, oss.str() + " [me]: " + message);
+        user_info_[name].add_message(name, time.tp, oss.str() + " [me]: " + message);
 
     else
     {
-        user_info_[name].add_message(time.tp, oss.str() + " [" + user + "]: " + message);
-        user_info_[user].add_message(time.tp, oss.str() + " [me->" + name + "]: " + message);
+        user_info_[name].add_message(user, time.tp, oss.str() + " [" + user + "]: " + message);
+        user_info_[user].add_message(name, time.tp, oss.str() + " [me]: " + message);
     }
 }
+
 // suggest 10 friend then shuffle the first 10 elements of the vector
 bool Network::Friends_suggestions(const std::string &user) noexcept
 {
@@ -168,9 +166,9 @@ bool Network::bfs(const std::string &user) noexcept
 
     return true;
 }
-bool Network::show_messages(const std::string &user) const noexcept
+bool Network::show_messages(const std::string &user, const std::string &name) const noexcept
 {
-    if (!user_info_.at(user).display_messages())
+    if (!user_info_.at(user).display_messages(name))
         return false;
 
     return true;
@@ -255,5 +253,14 @@ bool Network::show_bfs() const noexcept
     for (const auto &bfs : bfs_)
         std::cout << std::setw(SPACE) << std::left << "- " << bfs << "\n";
 
+    return true;
+}
+
+bool Network::check_if_user_exist_and_friend(const std::string &user, const std::string &name) const noexcept
+{
+    if (!users_set_.count(name))
+        return false;
+    if (!user_info_.at(user).check_if_friend_exist(name))
+        return false;
     return true;
 }

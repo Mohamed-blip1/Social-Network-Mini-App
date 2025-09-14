@@ -37,15 +37,23 @@ void user_menu(Network &network, const std::string &user_name, const std::string
         break;
 
         case 2:
-            if (!network.show_messages(user_name))
-                std::cout << "No messages received yet!\n";
-            break;
+        {
+            std::string other = utils::get_valid_string_from_user("Enter a Name: ");
+            if (!network.check_if_user_exist_and_friend(user_name, other))
+                std::cout << "No account found!\n";
+            else
+            {
+                if (!network.show_messages(user_name, other))
+                    std::cout << "No messages received yet!\n";
+            }
+        }
+        break;
 
         case 3:
         {
             std::string other = utils::get_valid_string_from_user("Enter a Name: ");
 
-            if (!network.check_if_user_exist(other))
+            if (!network.check_if_user_exist_and_friend(user_name, other))
             {
                 std::cout << "No account found!\n";
                 break;
@@ -53,14 +61,18 @@ void user_menu(Network &network, const std::string &user_name, const std::string
 
             else
             {
-                std::string message = utils::get_valid_string_from_user("Enter a message: ");
-
-                network.send_message(user_name, other, message);
-                std::cout << "Message sent.\n";
+                std::string message;
+                // is that posible
+                // exiting with esc
+                while (message != "esc")
+                {
+                    message = utils::get_valid_string_from_user("Enter a message (or type 'esc' to exit): ");
+                    network.send_message(user_name, other, message);
+                    std::cout << "Message sent.\n";
+                }
             }
-
-            break;
         }
+        break;
 
         case 4:
             std::cout << "Notifications:\n";
@@ -91,9 +103,17 @@ void user_menu(Network &network, const std::string &user_name, const std::string
             break;
 
         case 9:
-            network.clear_messages(user_name);
-            std::cout << "Messages have been cleared!\n";
-            break;
+        {
+            std::string other = utils::get_valid_string_from_user("Enter a name: ");
+            if (!network.check_if_user_exist_and_friend(user_name, other))
+                std::cout << "No account found!\n";
+            else
+            {
+                network.clear_messages(user_name, other);
+                std::cout << "Messages have been cleared!\n";
+            }
+        }
+        break;
 
         case 10:
             network.clear_notifications(user_name);

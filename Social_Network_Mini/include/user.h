@@ -1,5 +1,6 @@
 #pragma once
 // user.h
+#include <unordered_map>
 #include <unordered_set>
 #include "helpers.h"
 #include <vector>
@@ -35,31 +36,36 @@ public:
 
     bool display_notifications() const noexcept;
 
-    bool display_messages() const noexcept;
+    bool display_messages(const std::string &name) const noexcept;
 
     bool verify_password(const std::string &password) const noexcept;
 
-    void new_day(std::ostringstream &oss, Time &time) noexcept;
+    void new_day(const std::string &name, std::ostringstream &oss, Time &time) noexcept;
 
     void add_notification(const time_point &tp, const std::string &str) noexcept;
-    void add_message(const time_point &tp, const std::string &str) noexcept;
+    void add_message(const std::string &name,
+                     const time_point &tp,
+                     const std::string &str) noexcept;
 
-    void set_password(const std::string &password) noexcept;
+    void set_info(const std::string &name,const std::string &password) noexcept;
 
     void clear_notifications() noexcept;
-    void clear_messages() noexcept;
+    void clear_messages(const std::string &name) noexcept;
 
     const std::unordered_set<std::string> &
-    get_friends_set() const noexcept { return friends_set; }
+    get_friends_set() const noexcept { return friends_set_; }
     const std::vector<std::string> &
     get_friends_vec() const noexcept { return friends_vec; }
 
+    bool check_if_friend_exist(const std::string &name) const noexcept;
+
 private:
     std::string password_;
-    std::unordered_set<std::string> friends_set;
+    std::string user_name_;
+    std::unordered_map<std::string, std::deque<MessagesInfo>> boxes_;
+    std::unordered_set<std::string> friends_set_;
     std::vector<std::string> friends_vec;
     std::deque<std::pair<std::string, std::string>> latest_5_;
-    std::deque<MessagesInfo> messages_;
     std::deque<MessagesInfo> notifications_;
     system_clock::time_point day_check;
     bool new_day_;
