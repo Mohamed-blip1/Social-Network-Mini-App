@@ -40,6 +40,7 @@ void Network::add_friendship(const std::string &user, const std::string &name)
 {
     Time time;
     std::ostringstream oss;
+    time.tm = *std::localtime(&time.tt);
     oss << std::put_time(&time.tm, "%Y-%m-%d %H:%M");
 
     if (!users_set_.count(name))
@@ -54,14 +55,15 @@ void Network::add_friendship(const std::string &user, const std::string &name)
     // add friendship on bout users
     // and send a notification to the other user (He can remove)
     user_info_[name].add_friend(user, oss);
-    user_info_[name].add_notification(oss.str() + " :You and [" + user + "] are friends now!");
-    user_info_[user].add_notification(oss.str() + " :You and [" + name + "] are friends now!");
+    user_info_[name].add_notification(time.tp, oss.str() + " :You and [" + user + "] are friends now!");
+    user_info_[user].add_notification(time.tp, oss.str() + " :You and [" + name + "] are friends now!");
 }
 
 void Network::remove_friendship(const std::string &user, const std::string &name)
 {
     Time time;
     std::ostringstream oss;
+    time.tm = *std::localtime(&time.tt);
     oss << std::put_time(&time.tm, "%Y-%m-%d %H:%M");
 
     if (!users_set_.count(name))
@@ -74,27 +76,28 @@ void Network::remove_friendship(const std::string &user, const std::string &name
         throw std::runtime_error("'" + name + "' is not your friend!");
 
     user_info_[name].unfriend(user);
-    user_info_[name].add_notification(oss.str() + " :You and [" + user + "] are no longer friends!");
-    user_info_[user].add_notification(oss.str() + " :You and [" + name + "] are no longer friends!");
+    user_info_[name].add_notification(time.tp, oss.str() + " :You and [" + user + "] are no longer friends!");
+    user_info_[user].add_notification(time.tp, oss.str() + " :You and [" + name + "] are no longer friends!");
 }
 
 void Network::send_message(const std::string &user, const std::string &name, const std::string &message)
 {
     Time time;
     std::ostringstream oss;
+    time.tm = *std::localtime(&time.tt);
 
     if (user != name)
-        user_info_[user].new_day(oss, time.tm, time.now_time);
-    user_info_[name].new_day(oss, time.tm, time.now_time);
+        user_info_[user].new_day(oss, time);
+    user_info_[name].new_day(oss, time);
 
     oss << std::put_time(&time.tm, "%H:%M");
     if (user == name)
-        user_info_[name].add_message(oss.str() + " [you]: " + message);
+        user_info_[name].add_message(time.tp, oss.str() + " [me]: " + message);
 
     else
     {
-        user_info_[name].add_message(oss.str() + " [" + user + "]: " + message);
-        user_info_[user].add_message(oss.str() + " [me->" + name + "]: " + message);
+        user_info_[name].add_message(time.tp, oss.str() + " [" + user + "]: " + message);
+        user_info_[user].add_message(time.tp, oss.str() + " [me->" + name + "]: " + message);
     }
 }
 // suggest 10 friend then shuffle the first 10 elements of the vector

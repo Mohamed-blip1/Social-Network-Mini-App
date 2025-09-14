@@ -5,7 +5,7 @@ int main()
 {
     Network network;
 
-    size_t choice;
+    size_t choice = std::numeric_limits<size_t>::max();
     std::string user_name;
     std::string password;
     utils::menu();

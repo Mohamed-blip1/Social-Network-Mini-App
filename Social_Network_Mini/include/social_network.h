@@ -17,21 +17,8 @@ constexpr size_t LIMITS_TAKING = 4;
 
 constexpr size_t LIMITS = 10;
 
-struct Time
-{
-    using system_clock = std::chrono::system_clock;
-    system_clock::time_point now_time;
-    std::time_t tt;
-    std::tm tm;
-
-    Time()
-    {
-        now_time = system_clock::now();
-        tt = system_clock::to_time_t(now_time);
-        tm = *std::localtime(&tt);
-    }
-    ~Time() = default;
-};
+#pragma once
+#include <chrono>
 
 class Network
 {

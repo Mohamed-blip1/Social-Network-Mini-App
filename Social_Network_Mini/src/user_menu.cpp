@@ -7,7 +7,7 @@ void user_menu(Network &network, const std::string &user_name, const std::string
 
     // user space.
     std::cout << "Welcome back " << user_name << "!\n";
-    size_t choice;
+    size_t choice = std::numeric_limits<size_t>::max();
     utils::user_menu();
     while (choice != 0)
     {

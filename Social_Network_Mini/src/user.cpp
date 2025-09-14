@@ -86,7 +86,7 @@ bool UserInfo::display_notifications() const noexcept
         return false;
 
     for (const auto &notification : notifications_)
-        std::cout << "- " << notification << "\n";
+        std::cout << "- " << notification.content << "\n";
 
     return true;
 }
@@ -98,7 +98,7 @@ bool UserInfo::display_messages() const noexcept
         return false;
 
     for (auto it = messages_.rbegin(); it != messages_.rend(); ++it)
-        std::cout << "- " << *it << "\n";
+        std::cout << "- " << it->content << "\n";
 
     return true;
 }
@@ -110,18 +110,17 @@ bool UserInfo::verify_password(const std::string &password) const noexcept
     return true;
 }
 
-void UserInfo::new_day(std::ostringstream &oss, const std::tm &tm,
-                       const system_clock::time_point &tp) noexcept
+void UserInfo::new_day(std::ostringstream &oss, Time &time) noexcept
 {
-    auto duration = std::chrono::duration_cast<std::chrono::hours>(tp - day_check);
+    auto duration = std::chrono::duration_cast<std::chrono::hours>(time.tp - day_check);
     if (duration >= std::chrono::hours(DAY) || messages_.empty())
         new_day_ = true;
 
     if (new_day_)
     {
-        oss << std::put_time(&tm, "%Y-%m-%d");
+        oss << std::put_time(&time.tm, "%Y-%m-%d");
 
-        messages_.push_front(oss.str());
+        messages_.emplace_front(time.tp, oss.str());
         new_day_ = false;
         oss.str("");
         oss.clear();
@@ -129,10 +128,12 @@ void UserInfo::new_day(std::ostringstream &oss, const std::tm &tm,
 }
 
 void UserInfo::add_notification(
-    const std::string &str) noexcept { notifications_.emplace_front(str); }
+    const time_point &tp,
+    const std::string &str) noexcept { notifications_.emplace_front(tp, str); }
 
 void UserInfo::add_message(
-    const std::string &str) noexcept { messages_.emplace_front(str); }
+    const time_point &tp,
+    const std::string &str) noexcept { messages_.emplace_front(tp, str); }
 
 void UserInfo::set_password(
     const std::string &password) noexcept { password_ = password; }

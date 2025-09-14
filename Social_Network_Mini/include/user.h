@@ -1,20 +1,20 @@
 #pragma once
 // user.h
 #include <unordered_set>
-#include <iostream>
+#include "helpers.h"
 #include <vector>
-#include <chrono>
 #include <deque>
 
 constexpr size_t expected_friends_number = 25;
 constexpr float grow_by = 1.5;
 
-constexpr size_t MAX_RECENT = 5;
-constexpr size_t DAY = 24; // Hour
+constexpr size_t MAX_RECENT = 5; // Recent action
+constexpr size_t DAY = 24;       // Hour
 
 class UserInfo
 {
 public:
+    using time_point = std::chrono::system_clock::time_point;
     using system_clock = std::chrono::system_clock;
 
 public:
@@ -39,11 +39,10 @@ public:
 
     bool verify_password(const std::string &password) const noexcept;
 
-    void new_day(std::ostringstream &oss, const std::tm &tm,
-                 const system_clock::time_point &tp) noexcept;
+    void new_day(std::ostringstream &oss, Time &time) noexcept;
 
-    void add_notification(const std::string &str) noexcept;
-    void add_message(const std::string &str) noexcept;
+    void add_notification(const time_point &tp, const std::string &str) noexcept;
+    void add_message(const time_point &tp, const std::string &str) noexcept;
 
     void set_password(const std::string &password) noexcept;
 
@@ -60,8 +59,8 @@ private:
     std::unordered_set<std::string> friends_set;
     std::vector<std::string> friends_vec;
     std::deque<std::pair<std::string, std::string>> latest_5_;
-    std::deque<std::string> messages_;
-    std::deque<std::string> notifications_;
+    std::deque<MessagesInfo> messages_;
+    std::deque<MessagesInfo> notifications_;
     system_clock::time_point day_check;
     bool new_day_;
 };
