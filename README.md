@@ -1,9 +1,9 @@
-🧑‍🤝‍🧑 Social Network Mini App
+# 🧑‍🤝‍🧑 Social Network Mini App
 
 A console-based C++ application that simulates a simple social networking system.
 It allows users to sign up, log in, post messages, and interact with each other in a basic terminal UI.
 
-✨ Features
+## ✨ Features
 
 🔐 User sign-up and login system
 
@@ -15,8 +15,8 @@ It allows users to sign up, log in, post messages, and interact with each other 
 
 💾 Simple data handling via memory (no database)
 
+## 📁 Project Structure
 ```
-📁 Project Structure
 Social-Network-Mini-App/
 ├── .gitignore
 ├── README.md                 # This file
@@ -37,8 +37,8 @@ Social-Network-Mini-App/
     └── Makefile              # Build configuration
 ```
 
-⚙️ Build Instructions
-🛠 Prerequisites
+# ⚙️ Build Instructions
+## 🛠 Prerequisites
 
 A C++17 compiler (g++, clang++, or MSVC)
 
@@ -47,24 +47,28 @@ Make
 
 A terminal or shell (Linux, macOS, Windows with MSYS2)
 
-🧪 Compile & Run
-✅ Option 1: Using make
-# Navigate to project folder
-cd Social_Network_Mini
-
-# Compile
+# 🧪 Compile & Run
+## ✅ Option 1: Using make
+- Navigate to project folder
+```
+cd /home/your_path/Social_Network_Mini
+```
+- Compile
 ```
 make
 ```
 # Run
-./main.exe  # (or ./main on Linux/macOS)
-
-⚙️ Option 2: Manual compilation
+```
+./main      # Linux/macOS
+./main.exe  # Windows
+```
+## ⚙️ Option 2: Manual compilation
 ```
 g++ -std=c++17 -Iinclude -Isrc src/*.cpp main.cpp -o main.exe
-./main.exe
+./main      # Linux/macOS
+./main.exe  # Windows
 ```
-📌 Example Usage
+## 📌 Example Usage
 
 Once running, you’ll see a menu like this:
 ```
@@ -78,22 +82,22 @@ Once running, you’ll see a menu like this:
 
 You can:
 
-Create a user account
+- Create a user account
 
-Log in to your account
+- Log in to your account
 
 After Login:
 
-Post messages to your feed
+- Post messages to your feed
 
-Interact with other user data
+- Interact with other user data
 
-💡 Notes
+## 💡 Notes
 
 This is a simple educational project — no database or file storage yet.
 
 All data is stored in memory for the session.
 
-📜 License
+## 📜 License
 
 MIT License — free to use, modify, and share.
