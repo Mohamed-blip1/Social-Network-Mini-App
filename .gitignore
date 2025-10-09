@@ -44,7 +44,6 @@
 # Make / CMake backup or intermediate files
 CMakeFiles/
 CMakeCache.txt
-Makefile
 cmake_install.cmake
 build/
 
