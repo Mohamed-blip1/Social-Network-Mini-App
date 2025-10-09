@@ -52,6 +52,12 @@ build/
 *.log
 *.tmp
 
+
+# Editor files
+*.swp
+*.log
+*.tmp
+
 # OS-specific
 .DS_Store
 Thumbs.db

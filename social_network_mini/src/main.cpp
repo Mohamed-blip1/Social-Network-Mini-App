@@ -1,5 +1,5 @@
 // main.cpp
-#include "user_menu.h"
+#include "user_menu.hpp"
 
 int main()
 {
@@ -7,12 +7,11 @@ int main()
 
     size_t choice = std::numeric_limits<size_t>::max();
     std::string user_name;
-    std::string password;
+    std::string password; 
     utils::menu();
     while (choice != 0)
     {
         choice = utils::get_valid_number_from_user();
-        std::cout << "\n";
         switch (choice)
         {
         case 0:

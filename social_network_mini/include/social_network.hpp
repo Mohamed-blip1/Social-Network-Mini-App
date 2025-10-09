@@ -1,8 +1,8 @@
 #pragma once
-// Social_Network.h
+// Social_Network.hpp
 #include <random>
 #include <iomanip>
-#include "user.h"
+#include "user.hpp"
 
 constexpr size_t USERS_EXPECTED = 100;
 constexpr float GROW_BY = 1.5;
@@ -41,7 +41,8 @@ public:
 
     void remove_friendship(const std::string &user, const std::string &name);
 
-    void send_message(const std::string &user, const std::string &name, const std::string &message);
+    void send_message(const std::string &user,
+                      const std::string &name, const std::string &message);
 
     // suggest 10 friend then shuffle the first 10 elements of the vector
     bool Friends_suggestions(const std::string &user) noexcept;
@@ -56,15 +57,19 @@ public:
     bool recent_actions(const std::string &user) const noexcept;
     bool notifications(const std::string &user) const noexcept;
 
-    void clear_notifications(const std::string &user) { user_info_[user].clear_notifications(); }
-    void clear_messages(const std::string &user, const std::string &name) { user_info_[user].clear_messages(name); }
+    void clear_notifications(
+        const std::string &user) { user_info_[user].clear_notifications(); }
+    void clear_messages(
+        const std::string &user,
+        const std::string &name) { user_info_[user].clear_messages(name); }
 
     // befor send message
-    bool check_if_user_exist_and_friend(const std::string &user, const std::string &name) const noexcept;
+    bool check_if_user_exist_and_friend(const std::string &user,
+                                        const std::string &name) const noexcept;
 
 private:
     // splited Fisher-Yates shuffle only for first 10 slots
-    void limited_shuffle(size_t _max) noexcept;
+    void limited_shuffle(const std::string &user, size_t _max) noexcept;
 
     bool filter(const std::vector<std::string> &user_friends,
                 const std::string &user, const std::string &target) const noexcept;

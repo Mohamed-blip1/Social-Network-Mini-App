@@ -17,10 +17,10 @@ It allows users to sign up, log in, post messages, and interact with each other 
 
 ## 📁 Project Structure
 ```
-Social-Network-Mini-App/
+cpp-Social-Network/
 ├── .gitignore
 ├── README.md                 # This file
-└── Social_Network_Mini/
+└── social_network_mini/
     ├── include/              # Header files
     │   ├── user.h            # User class
     │   ├── user_menu.h       # User interface logic
@@ -28,12 +28,12 @@ Social-Network-Mini-App/
     │   └── utils.h           # Utilities
 
     ├── src/                  # Source files
+    |   ├── main.cpp              # Program entry point
     │   ├── user.cpp
     │   ├── user_menu.cpp
     │   ├── social_network.cpp
     │   └── utils.cpp
 
-    ├── main.cpp              # Program entry point
     └── Makefile              # Build configuration
 ```
 
@@ -51,7 +51,7 @@ A terminal or shell (Linux, macOS, Windows with MSYS2)
 ## ✅ Option 1: Using make
 - Navigate to project folder
 ```
-cd /home/your_path/Social_Network_Mini
+cd /home/your_path/cpp-Social-Network/social_network_mini
 ```
 - Compile
 ```
@@ -64,13 +64,13 @@ make
 ```
 ## ⚙️ Option 2: Manual compilation
 ```
-g++ -std=c++17 -Iinclude -Isrc src/*.cpp main.cpp -o main.exe
+g++ -std=c++17 -Iinclude -Isrc src/*.cpp -o main.exe
 ./main      # Linux/macOS
 ./main.exe  # Windows
 ```
-## 📌 Example Usage
+# 📌 Example Usage
 
-Once running, you’ll see a menu like this:
+- Once running, you’ll see a menu like this:
 ```
 ===== Social Network Menu =====
 1 - Login
@@ -79,19 +79,37 @@ Once running, you’ll see a menu like this:
 0 - Exit
 >
 ```
+- After creating an account and logging in
+```
+---- User Menu ----
+1  - Add friend
+2  - Recent messages
+3  - Send message
+4  - Notifications
+5  - Show friends
+6  - Friends-of-friends suggestions
+7  - Friends suggestions
+8  - recent actions
+9  - Clear Messages
+10 - Clear Notifications
+11 - Remove friend
+12 - Menu
+0  - Logout
+> 
+```
 
-You can:
-
+- You can:
+```
 - Create a user account
 
 - Log in to your account
-
-After Login:
-
+```
+- After Login:
+```
 - Post messages to your feed
 
 - Interact with other user data
-
+```
 ## 💡 Notes
 
 This is a simple educational project — no database or file storage yet.

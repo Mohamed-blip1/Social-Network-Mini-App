@@ -1,5 +1,5 @@
 // social_network.cpp
-#include "social_network.h"
+#include "social_network.hpp"
 
 Network::Network() noexcept
 {
@@ -11,6 +11,14 @@ Network::Network() noexcept
     users_set_.max_load_factor(0.7);
 
     users_vec_.reserve(USERS_EXPECTED * GROW_BY);
+#ifdef DEBUG
+    std::string st;
+    for (size_t i = 0; i < 20; ++i)
+    {
+        st = 'a' + i;
+        sign_up(st, st);
+    }
+#endif
 }
 
 void Network::Login(const std::string &name, const std::string &password) const
@@ -89,12 +97,12 @@ void Network::send_message(const std::string &user, const std::string &name, con
 
     oss << std::put_time(&time.tm, "%H:%M");
     if (user == name)
-        user_info_[name].add_message(name, time.tp, oss.str() + " [me]: " + message);
+        user_info_[name].add_message(name, time.tp, oss, oss.str() + " [me]: " + message);
 
     else
     {
-        user_info_[name].add_message(user, time.tp, oss.str() + " [" + user + "]: " + message);
-        user_info_[user].add_message(name, time.tp, oss.str() + " [me]: " + message);
+        user_info_[name].add_message(user, time.tp, oss, oss.str() + " [" + user + "]: " + message);
+        user_info_[user].add_message(name, time.tp, oss, oss.str() + " [me]: " + message);
     }
 }
 
@@ -103,14 +111,14 @@ bool Network::Friends_suggestions(const std::string &user) noexcept
 {
     const size_t _size = users_vec_.size();
 
-    limited_shuffle(_size);
+    limited_shuffle(user, _size);
 
     // there is only 1 user
     if (_size <= ONE_USER)
         return false;
 
-    int n = 1;
-    for (int i = 0; i < _size; ++i)
+    size_t n = 1;
+    for (int i = 0; i < (int)_size; ++i)
     {
         // skip if candidate is self or already a friend
         if (users_vec_[i] == user ||
@@ -200,9 +208,9 @@ bool Network::notifications(const std::string &user) const noexcept
 }
 
 // splited Fisher-Yates shuffle only for first 10 slots
-void Network::limited_shuffle(size_t _max) noexcept
+void Network::limited_shuffle(const std::string &user, size_t _max) noexcept
 {
-    // In Friends_suggestions, you shuffle all users. Ideally, only shuffle non-friends that are candidates.
+    // Later: only shuffle non-friends that are candidates.
     std::random_device rd;
     std::mt19937 gen(rd());
 
@@ -210,7 +218,6 @@ void Network::limited_shuffle(size_t _max) noexcept
     for (size_t i = 0; i < limits_shuffle; ++i)
     {
         std::uniform_int_distribution<size_t> distrib(i, _max - 1);
-
         size_t j = distrib(gen);
 
         if (i != j)

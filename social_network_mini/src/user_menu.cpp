@@ -1,5 +1,5 @@
 // user_menu.cpp
-#include "user_menu.h"
+#include "user_menu.hpp"
 
 void user_menu(Network &network, const std::string &user_name, const std::string &password)
 {
@@ -12,7 +12,6 @@ void user_menu(Network &network, const std::string &user_name, const std::string
     while (choice != 0)
     {
         choice = utils::get_valid_number_from_user();
-        std::cout << "\n";
         switch (choice)
         {
         case 0:
@@ -38,7 +37,7 @@ void user_menu(Network &network, const std::string &user_name, const std::string
 
         case 2:
         {
-            std::string other = utils::get_valid_string_from_user("Enter a Name: ");
+            std::string other = utils::get_valid_string_from_user("Enter a friend Name: ");
             if (!network.check_if_user_exist_and_friend(user_name, other))
                 std::cout << "No account found!\n";
             else
@@ -62,12 +61,17 @@ void user_menu(Network &network, const std::string &user_name, const std::string
             else
             {
                 std::string message;
-                message = utils::get_valid_string_from_user("Enter a message (or type 'esc' to exit): ");
-                while (message != "esc")
+                std::cout << "Enter your messages and type [exit] to end:\n";
+                message =
+                    utils::get_valid_string_from_user(
+                        "-");
+                while (message != "exit")
                 {
                     network.send_message(user_name, other, message);
                     std::cout << "Message sent.\n";
-                    message = utils::get_valid_string_from_user("Enter a message (or type 'esc' to exit): ");
+                    message =
+                        utils::get_valid_string_from_user(
+                            "-");
                 }
             }
         }
