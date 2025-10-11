@@ -3,21 +3,28 @@
 #include <random>
 #include <iomanip>
 #include "user.hpp"
+#include <chrono>
 
 constexpr size_t USERS_EXPECTED = 100;
 constexpr float GROW_BY = 1.5;
-
 constexpr size_t SPACE = 3;
 constexpr size_t DISPLAY_LIMITS = 10;
 constexpr size_t ONE_USER = 1;
 constexpr size_t _0_FRIENDS_DISPLAYED = 1;
-
 constexpr size_t LIMITS_TAKING = 4;
-
 constexpr size_t LIMITS = 10;
+constexpr bool UnfriendMsg = 0;
+constexpr bool AdFriendMsg = 1;
 
-#pragma once
-#include <chrono>
+enum class Result
+{
+    Success,
+    UserNotFound,
+    IncorrectPassword,
+    AlreadyFriends,
+    NotFriend,
+    SameUser
+};
 
 class Network
 {
@@ -26,23 +33,23 @@ public:
 
 public:
     // tuning
-    Network() noexcept;
+    explicit Network() noexcept;
 
 public:
     // Use Error handling (try/catch)!!!!!!
-    void Login(const std::string &name, const std::string &password) const;
+    [[nodiscard]] Result login(const std::string &name, const std::string &password) const noexcept;
 
-    bool sign_up(const std::string &name, const std::string &password) noexcept;
+    bool sign_up(const std::string &name, std::string password) noexcept;
 
 public:
     // user SPACE actions.
 
-    void add_friendship(const std::string &user, const std::string &name);
+    [[nodiscard]] Result add_friendship(const std::string &user, const std::string &other) noexcept;
 
-    void remove_friendship(const std::string &user, const std::string &name);
+    [[nodiscard]] Result remove_friendship(const std::string &user, const std::string &other) noexcept;
 
     void send_message(const std::string &user,
-                      const std::string &name, const std::string &message);
+                      const std::string &other, const std::string &message) noexcept;
 
     // suggest 10 friend then shuffle the first 10 elements of the vector
     bool Friends_suggestions(const std::string &user) noexcept;
@@ -51,34 +58,42 @@ public:
     bool bfs(const std::string &user) noexcept;
 
     bool show_messages(const std::string &user,
-                       const std::string &name) const noexcept;
+                       const std::string &other) const noexcept;
     bool show_friends(const std::string &user) const noexcept;
     // show recent 5 friend actions
     bool recent_actions(const std::string &user) const noexcept;
     bool notifications(const std::string &user) const noexcept;
 
+    bool change_password(const std::string &name,
+                         std::string new_pass) noexcept;
+
     void clear_notifications(
-        const std::string &user) { user_info_[user].clear_notifications(); }
+        const std::string &user) noexcept { user_info_.at(user).clear_notifications(); }
     void clear_messages(
         const std::string &user,
-        const std::string &name) { user_info_[user].clear_messages(name); }
+        const std::string &name) noexcept { user_info_.at(user).clear_messages(name); }
 
     // befor send message
-    bool check_if_user_exist_and_friend(const std::string &user,
-                                        const std::string &name) const noexcept;
+     bool user_and_friend_exist(const std::string &user,
+                                      const std::string &other) const noexcept;
+    inline bool user_exist(const std::string &name) const noexcept;
+
+    inline UserInfo *get_user(const std::string &name) noexcept;
+    inline const UserInfo *get_user(const std::string &name) const noexcept;
 
 private:
     // splited Fisher-Yates shuffle only for first 10 slots
-    void limited_shuffle(const std::string &user, size_t _max) noexcept;
+    void limited_shuffle(size_t _max) noexcept;
 
     bool filter(const std::vector<std::string> &user_friends,
                 const std::string &user, const std::string &target) const noexcept;
 
     bool show_bfs() const noexcept;
 
+    const std::string notification_msg(const std::string &time_st, const std::string &name, bool choice = AdFriendMsg) const noexcept;
+
 private:
     std::unordered_map<std::string, UserInfo> user_info_;
-    std::unordered_set<std::string> users_set_;
     std::vector<std::string> users_vec_;
     std::deque<std::string> bfs_;
 };

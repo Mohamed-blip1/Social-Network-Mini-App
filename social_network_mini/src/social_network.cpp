@@ -3,12 +3,8 @@
 
 Network::Network() noexcept
 {
-
     user_info_.rehash(USERS_EXPECTED * GROW_BY);
     user_info_.max_load_factor(0.7);
-
-    users_set_.rehash(USERS_EXPECTED * GROW_BY);
-    users_set_.max_load_factor(0.7);
 
     users_vec_.reserve(USERS_EXPECTED * GROW_BY);
 #ifdef DEBUG
@@ -21,89 +17,103 @@ Network::Network() noexcept
 #endif
 }
 
-void Network::Login(const std::string &name, const std::string &password) const
+Result Network::login(const std::string &name, const std::string &password) const noexcept
 {
+    auto user = get_user(name);
     // if Not exist
-    if (!users_set_.count(name))
-        throw std::runtime_error("Username not found!");
+    if (!user)
+        return Result::UserNotFound;
 
-    if (!user_info_.at(name).verify_password(password))
-        throw std::runtime_error("Incorrect password!");
+    if (!user->verify_password(password))
+        return Result::IncorrectPassword;
+
+    return Result::Success;
 }
 
-bool Network::sign_up(const std::string &name, const std::string &password) noexcept
+bool Network::sign_up(const std::string &name, std::string password) noexcept
 {
     // if exist
-    if (users_set_.count(name))
+    if (user_exist(name))
         return false;
 
-    users_set_.emplace(name);
+    // here
     users_vec_.emplace_back(name);
-    user_info_[name].set_info(name, password);
-    add_friendship(name, name);
-
+    user_info_.try_emplace(name, std::move(password));
+    (void)add_friendship(name, name);
     return true;
 }
 
-void Network::add_friendship(const std::string &user, const std::string &name)
+Result Network::add_friendship(const std::string &user, const std::string &other) noexcept
 {
+
+    auto other_it = get_user(other);
+    if (!other_it)
+        return Result::UserNotFound;
+
+    auto user_it = get_user(user);
+    if (user_it->check_friend_exist(other))
+        return Result::AlreadyFriends;
+
     Time time;
     std::ostringstream oss;
-    time.tm = *std::localtime(&time.tt);
     oss << std::put_time(&time.tm, "%Y-%m-%d %H:%M");
 
-    if (!users_set_.count(name))
-        throw std::runtime_error("No account found!");
+    // In sign-up every account add it self as a friend
+    user_it->add_friend(other, oss.str());
+    user_it->add_notification(
+        time.tp, notification_msg(oss.str(), other, AdFriendMsg));
 
-    if (!user_info_[user].add_friend(name, oss))
-        throw std::runtime_error("Friend already exist!");
+    if (user_it != other_it)
+    {
+        other_it->add_friend(user, oss.str());
+        other_it->add_notification(
+            time.tp, notification_msg(oss.str(), user, AdFriendMsg));
+    }
 
-    // add friendship on bout users
-    // and send a notification to the other user (He can remove)
-    user_info_[name].add_friend(user, oss);
-    if (user != name)
-        user_info_[name].add_notification(time.tp, oss.str() + " :You and [" + user + "] are friends now!");
-    user_info_[user].add_notification(time.tp, oss.str() + " :You and [" + name + "] are friends now!");
+    return Result::Success;
 }
 
-void Network::remove_friendship(const std::string &user, const std::string &name)
+Result Network::remove_friendship(const std::string &user, const std::string &other) noexcept
 {
+    auto other_it = get_user(other);
+    if (!other_it)
+        return Result::UserNotFound;
+
+    auto user_it = get_user(user);
+    if (user_it == other_it)
+        return Result::SameUser;
+
+    if (!user_it->unfriend(other))
+        return Result::NotFriend;
+
+    other_it->unfriend(user);
+
     Time time;
     std::ostringstream oss;
-    time.tm = *std::localtime(&time.tt);
     oss << std::put_time(&time.tm, "%Y-%m-%d %H:%M");
 
-    if (!users_set_.count(name))
-        throw std::runtime_error("No account found!");
+    other_it->add_notification(time.tp, notification_msg(oss.str(), user, UnfriendMsg));
+    user_it->add_notification(time.tp, notification_msg(oss.str(), other, UnfriendMsg));
 
-    if (!user_info_[user].unfriend(name))
-        throw std::runtime_error("'" + name + "' is not your friend!");
-
-    user_info_[name].unfriend(user);
-    if (user != name)
-        user_info_[name].add_notification(time.tp, oss.str() + " :You and [" + user + "] are no longer friends!");
-    user_info_[user].add_notification(time.tp, oss.str() + " :You and [" + name + "] are no longer friends!");
+    return Result::Success;
 }
 
-void Network::send_message(const std::string &user, const std::string &name, const std::string &message)
+void Network::send_message(const std::string &user, const std::string &other, const std::string &message) noexcept
 {
     Time time;
     std::ostringstream oss;
-    time.tm = *std::localtime(&time.tt);
 
-    if (user != name)
-        user_info_[user].new_day(name, oss, time);
-    user_info_[name].new_day(user, oss, time);
+    auto user_it = get_user(user);
+    auto other_it = get_user(other);
+
+    if (user_it != other_it)
+        user_it->new_day(other, oss, time);
+    other_it->new_day(user, oss, time);
 
     oss << std::put_time(&time.tm, "%H:%M");
-    if (user == name)
-        user_info_[name].add_message(name, time.tp, oss, oss.str() + " [me]: " + message);
-
-    else
-    {
-        user_info_[name].add_message(user, time.tp, oss, oss.str() + " [" + user + "]: " + message);
-        user_info_[user].add_message(name, time.tp, oss, oss.str() + " [me]: " + message);
-    }
+    if (user_it != other_it)
+        other_it->add_message(user, time.tp, oss.str(), oss.str() + " [" + user + "]: " + message);
+    user_it->add_message(other, time.tp, oss.str(), oss.str() + " [me]: " + message);
 }
 
 // suggest 10 friend then shuffle the first 10 elements of the vector
@@ -111,32 +121,27 @@ bool Network::Friends_suggestions(const std::string &user) noexcept
 {
     const size_t _size = users_vec_.size();
 
-    limited_shuffle(user, _size);
-
     // there is only 1 user
     if (_size <= ONE_USER)
         return false;
 
+    limited_shuffle(_size);
+    auto user_it = get_user(user);
+
     size_t n = 1;
-    for (int i = 0; i < (int)_size; ++i)
+    for (size_t i = 0; i < _size && n < DISPLAY_LIMITS; ++i)
     {
+        std::string &candidate = users_vec_[i];
         // skip if candidate is self or already a friend
-        if (users_vec_[i] == user ||
-            user_info_[user].get_friends_set().count(users_vec_[i]))
+        if (candidate == user ||
+            user_it->check_friend_exist(candidate))
             continue;
 
         // show friend suggestion
-        std::cout << std::setw(SPACE) << std::left << n++ << "- " << users_vec_[i] << "\n";
-
-        if (n >= DISPLAY_LIMITS)
-            break;
+        std::cout << std::setw(SPACE) << std::left << n++ << "- " << candidate << "\n";
     }
 
-    // if no friend printed
-    if (n == _0_FRIENDS_DISPLAYED)
-        return false;
-
-    return true;
+    return n != _0_FRIENDS_DISPLAYED;
 }
 
 // max friend of friend suggesting: 8
@@ -144,23 +149,26 @@ bool Network::bfs(const std::string &user) noexcept
 {
     bfs_.clear();
 
-    const auto &user_friends = user_info_[user].get_friends_vec();
+    const auto &user_friends = user_info_.at(user).get_friends_vec();
     const size_t &_size = user_friends.size();
 
     if (user_friends.empty())
         return false;
 
+    const std::string *name;
     for (size_t i = 0; i < _size; ++i)
     {
-        const auto &friends_of_friend = user_info_[user_friends[i]].get_friends_vec();
+        const auto &friends_of_friend = user_info_.at(user_friends[i]).get_friends_vec();
 
         size_t max = 0;
         for (size_t j = 0; j < friends_of_friend.size(); ++j)
         {
-            if (!filter(user_friends, user, friends_of_friend[j]))
+            name = &friends_of_friend[j];
+
+            if (!filter(user_friends, user, *name))
                 continue;
 
-            bfs_.push_front(friends_of_friend[j]);
+            bfs_.push_front(*name);
 
             if (++max >= LIMITS_TAKING)
                 break;
@@ -169,60 +177,43 @@ bool Network::bfs(const std::string &user) noexcept
             break;
     }
 
+    // If no friends of friends
     if (!show_bfs())
         return false;
 
     return true;
 }
+
 bool Network::show_messages(const std::string &user, const std::string &name) const noexcept
 {
-    if (!user_info_.at(user).display_messages(name))
-        return false;
-
-    return true;
+    return user_info_.at(user).display_messages(name);
 }
 
 bool Network::show_friends(const std::string &user) const noexcept
 {
-    if (!user_info_.at(user).display_friends())
-        return false;
-
-    return true;
+    return user_info_.at(user).display_friends();
 }
 
 // show recent 5 friend actions
 bool Network::recent_actions(const std::string &user) const noexcept
 {
-    if (!user_info_.at(user).display_recent_actions())
-        return false;
-
-    return true;
+    return user_info_.at(user).display_recent_actions();
 }
 
 bool Network::notifications(const std::string &user) const noexcept
 {
-    if (!user_info_.at(user).display_notifications())
-        return false;
-
-    return true;
+    return user_info_.at(user).display_notifications();
 }
 
 // splited Fisher-Yates shuffle only for first 10 slots
-void Network::limited_shuffle(const std::string &user, size_t _max) noexcept
+void Network::limited_shuffle(size_t _max) noexcept
 {
     // Later: only shuffle non-friends that are candidates.
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    std::mt19937 gen(std::random_device{}());
 
-    size_t limits_shuffle = std::min<size_t>(LIMITS, _max);
-    for (size_t i = 0; i < limits_shuffle; ++i)
-    {
-        std::uniform_int_distribution<size_t> distrib(i, _max - 1);
-        size_t j = distrib(gen);
-
-        if (i != j)
-            std::swap(users_vec_[i], users_vec_[j]);
-    }
+    for (size_t i = 0, limits = std::min<size_t>(LIMITS, _max); i < limits; ++i)
+        std::swap(users_vec_[i],
+                  users_vec_[std::uniform_int_distribution<size_t>(i, _max - 1)(gen)]);
 }
 
 bool Network::filter(const std::vector<std::string> &user_friends,
@@ -233,21 +224,26 @@ bool Network::filter(const std::vector<std::string> &user_friends,
         return false;
 
     // if already printed
-    bool already_exist = false;
-    for (size_t i = 0; i < bfs_.size(); ++i)
-        if (bfs_[i] == target)
-        {
-            already_exist = true;
-            break;
-        }
-    if (already_exist)
+    if (std::find(bfs_.begin(),
+                  bfs_.end(), target) != bfs_.end())
         return false;
 
     // existing friends
-    auto it = std::lower_bound(user_friends.begin(), user_friends.end(), target);
-    if (it != user_friends.end() && *it == target)
+    if (std::binary_search(user_friends.begin(),
+                           user_friends.end(), target))
         return false;
 
+    return true;
+}
+
+bool Network::change_password(const std::string &user, std::string new_pass) noexcept
+{
+    // is it butter to change hole disane a bit and send the user pointer as a parameter instead of sending the name as a string ?
+    auto user_it = get_user(user);
+    if (!user_it)
+        return false;
+
+    user_it->set_password(std::move(new_pass));
     return true;
 }
 
@@ -263,11 +259,34 @@ bool Network::show_bfs() const noexcept
     return true;
 }
 
-bool Network::check_if_user_exist_and_friend(const std::string &user, const std::string &name) const noexcept
+UserInfo *Network::get_user(const std::string &name) noexcept
 {
-    if (!users_set_.count(name))
+    auto it = user_info_.find(name);
+    return (it != user_info_.end()) ? &it->second : nullptr;
+}
+const UserInfo *Network::get_user(const std::string &name) const noexcept
+{
+    auto it = user_info_.find(name);
+    return (it != user_info_.end()) ? &it->second : nullptr;
+}
+
+bool Network::user_exist(const std::string &name) const noexcept
+{
+    return user_info_.find(name) != user_info_.end();
+}
+
+bool Network::user_and_friend_exist(const std::string &user, const std::string &other) const noexcept
+{
+    if (!user_exist(other))
         return false;
-    if (!user_info_.at(user).check_if_friend_exist(name))
-        return false;
-    return true;
+
+    return user_info_.at(user).check_friend_exist(other);
+}
+
+const std::string Network::notification_msg(const std::string &time_st, const std::string &name, bool choice) const noexcept
+{
+    if (choice == UnfriendMsg)
+        return time_st + " :You and [" + name + "] are no longer friends!";
+    // AdFriendMsg
+    return time_st + " :You and [" + name + "] are friends now!";
 }

@@ -7,7 +7,7 @@ int main()
 
     size_t choice = std::numeric_limits<size_t>::max();
     std::string user_name;
-    std::string password; 
+    std::string password;
     utils::menu();
     while (choice != 0)
     {
@@ -16,7 +16,7 @@ int main()
         {
         case 0:
             // exit:
-            std::cout << "Goodbye!";
+            std::cout << "Goodbye!\n";
             break;
 
         case 1:
@@ -24,22 +24,15 @@ int main()
             // Login:
             user_name = utils::get_valid_string_from_user("Enter Your Name: ");
             password = utils::get_valid_string_from_user("Enter Your Password: ");
-            try
-            {
-                user_menu(network, user_name, password);
-            }
-            catch (const std::exception &e)
-            {
-                std::cout << "Error: " << e.what() << "\n";
-            }
-            break;
+            user_menu(network, user_name, password);
         }
+        break;
         case 2:
             // Sign-up:
             user_name = utils::get_valid_string_from_user("Enter Your Name: ");
             password = utils::get_valid_string_from_user("Enter Your Password: ");
 
-            if (!network.sign_up(user_name, password))
+            if (!network.sign_up(user_name, std::move(password)))
                 std::cout << "Username already exists!\n";
             else
                 // Enter user space.

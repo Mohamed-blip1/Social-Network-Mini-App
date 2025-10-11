@@ -3,10 +3,22 @@
 
 void user_menu(Network &network, const std::string &user_name, const std::string &password)
 {
-    network.Login(user_name, password);
+    switch (network.login(user_name, password))
+    {
+    case Result::UserNotFound:
+        std::cout << "User name not found!\n";
+        return;
+    case Result::IncorrectPassword:
+        std::cout << "Incorrect password!\n";
+        return;
+    case Result::Success:
+        std::cout << "Welcome back " << user_name << "!\n";
+        break;
+    default:
+        break;
+    }
 
     // user space.
-    std::cout << "Welcome back " << user_name << "!\n";
     size_t choice = std::numeric_limits<size_t>::max();
     utils::user_menu();
     while (choice != 0)
@@ -23,14 +35,19 @@ void user_menu(Network &network, const std::string &user_name, const std::string
         {
             std::string other = utils::get_valid_string_from_user("Enter a Name: ");
 
-            try
+            switch (network.add_friendship(user_name, other))
             {
-                network.add_friendship(user_name, other);
+            case Result::Success:
                 std::cout << "You and '" << other << "' are friends now.\n";
-            }
-            catch (const std::exception &e)
-            {
-                std::cout << "Error: " << e.what() << "\n";
+                break;
+            case Result::UserNotFound:
+                std::cout << "User not found!\n";
+                break;
+            case Result::AlreadyFriends:
+                std::cout << "Friend already exist!\n";
+                break;
+            default:
+                break;
             }
         }
         break;
@@ -38,13 +55,14 @@ void user_menu(Network &network, const std::string &user_name, const std::string
         case 2:
         {
             std::string other = utils::get_valid_string_from_user("Enter a friend Name: ");
-            if (!network.check_if_user_exist_and_friend(user_name, other))
-                std::cout << "No account found!\n";
-            else
+            if (!network.user_and_friend_exist(user_name, other))
             {
-                if (!network.show_messages(user_name, other))
-                    std::cout << "No messages received yet!\n";
+                std::cout << "No account found!\n";
+                break;
             }
+
+            if (!network.show_messages(user_name, other))
+                std::cout << "No messages received yet!\n";
         }
         break;
 
@@ -52,27 +70,25 @@ void user_menu(Network &network, const std::string &user_name, const std::string
         {
             std::string other = utils::get_valid_string_from_user("Enter a Name: ");
 
-            if (!network.check_if_user_exist_and_friend(user_name, other))
+            if (!network.user_and_friend_exist(user_name, other))
             {
                 std::cout << "No account found!\n";
                 break;
             }
 
-            else
+            std::string message;
+            std::cout << "Enter your messages and type [exit] to end:\n";
+
+            while (true)
             {
-                std::string message;
-                std::cout << "Enter your messages and type [exit] to end:\n";
                 message =
-                    utils::get_valid_string_from_user(
-                        "-");
-                while (message != "exit")
-                {
-                    network.send_message(user_name, other, message);
-                    std::cout << "Message sent.\n";
-                    message =
-                        utils::get_valid_string_from_user(
-                            "-");
-                }
+                    utils::get_valid_string_from_user("-");
+
+                if (message == "exit")
+                    break;
+
+                network.send_message(user_name, other, message);
+                std::cout << "Message sent.\n";
             }
         }
         break;
@@ -107,14 +123,17 @@ void user_menu(Network &network, const std::string &user_name, const std::string
 
         case 9:
         {
-            std::string other = utils::get_valid_string_from_user("Enter a name: ");
-            if (!network.check_if_user_exist_and_friend(user_name, other))
-                std::cout << "No account found!\n";
-            else
+            std::string other =
+                utils::get_valid_string_from_user("Enter a name: ");
+
+            if (!network.user_and_friend_exist(user_name, other))
             {
-                network.clear_messages(user_name, other);
-                std::cout << "Messages have been cleared!\n";
+                std::cout << "No account found!\n";
+                break;
             }
+
+            network.clear_messages(user_name, other);
+            std::cout << "Messages have been cleared!\n";
         }
         break;
 
@@ -127,14 +146,22 @@ void user_menu(Network &network, const std::string &user_name, const std::string
         {
             std::string other = utils::get_valid_string_from_user("Enter a Name: ");
 
-            try
+            switch (network.remove_friendship(user_name, other))
             {
-                network.remove_friendship(user_name, other);
+            case Result::Success:
                 std::cout << "You and '" + other + "' are no longer friends!\n";
-            }
-            catch (const std::exception &e)
-            {
-                std::cout << "Error: " << e.what() << "\n";
+                break;
+            case Result::UserNotFound:
+                std::cout << "No account found!\n";
+                break;
+            case Result::SameUser:
+                std::cout << "Can't unfriend your self!\n";
+                break;
+            case Result::NotFriend:
+                std::cout << "'" << other << "' is not a friend!\n";
+                break;
+            default:
+                break;
             }
         }
         break;

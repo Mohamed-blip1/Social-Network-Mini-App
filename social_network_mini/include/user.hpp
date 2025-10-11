@@ -5,6 +5,7 @@
 #include "helpers.hpp"
 #include <vector>
 #include <deque>
+#include <algorithm>
 
 constexpr size_t expected_friends_number = 25;
 constexpr float grow_by = 1.5;
@@ -20,12 +21,13 @@ public:
 
 public:
     // tuning
-    UserInfo() noexcept;
+    // UserInfo() noexcept = default;
+    explicit UserInfo(std::string pass) noexcept;
 
 public:
     // Add time
     bool add_friend(const std::string &name,
-                    const std::ostringstream &oss) noexcept;
+                    std::string st_time) noexcept;
 
     // Here to
     bool unfriend(const std::string &name) noexcept;
@@ -42,30 +44,27 @@ public:
 
     void new_day(const std::string &name, std::ostringstream &oss, Time &time) noexcept;
 
-    void add_notification(const time_point &tp, const std::string &str) noexcept;
+    void add_notification(const time_point &tp, std::string str) noexcept;
     void add_message(const std::string &name,
                      const time_point &tp,
-                     const std::ostringstream &oss,
-                     const std::string &str) noexcept;
+                     std::string str,
+                     std::string message) noexcept;
 
-    void set_info(const std::string &name, const std::string &password) noexcept;
+    void set_password(std::string password) noexcept;
 
     void clean_old_actions() noexcept;
     void clear_notifications() noexcept;
     void clear_messages(const std::string &name) noexcept;
 
-    const std::unordered_set<std::string> &
-    get_friends_set() const noexcept { return friends_set_; }
     const std::vector<std::string> &
     get_friends_vec() const noexcept { return friends_vec; }
 
-    bool check_if_friend_exist(const std::string &name) const noexcept;
+    const bool check_friend_exist(const std::string &name) const noexcept;
 
 private:
-    std::string password_;
     std::string user_name_;
+    std::string password_;
     std::unordered_map<std::string, std::deque<MessagesInfo>> boxes_;
-    std::unordered_set<std::string> friends_set_;
     std::vector<std::string> friends_vec;
     std::deque<std::pair<std::string, std::string>> latest_10_;
     std::deque<MessagesInfo> notifications_;

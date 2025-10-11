@@ -20,7 +20,7 @@ release: CXXFLAGS += -O3
 release: $(TARGET)
 
 # Debug
-debug: CXXFLAGS += -O0 -DDEBUG
+debug: CXXFLAGS += -O0 -DDEBUG -g
 debug: $(TARGET)
 
 $(TARGET): $(OBJS)

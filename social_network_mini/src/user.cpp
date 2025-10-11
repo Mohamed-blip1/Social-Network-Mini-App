@@ -3,12 +3,9 @@
 #include <iostream>
 #include <iomanip>
 
-UserInfo::UserInfo() noexcept
+UserInfo::UserInfo(std::string pass) noexcept
+    : password_(std::move(pass))
 {
-
-    friends_set_.rehash(expected_friends_number * grow_by);
-    friends_set_.max_load_factor(0.7);
-
     boxes_.rehash(expected_friends_number * grow_by);
     boxes_.max_load_factor(0.7);
 
@@ -18,44 +15,46 @@ UserInfo::UserInfo() noexcept
 }
 
 bool UserInfo::add_friend(const std::string &name,
-                          const std::ostringstream &oss) noexcept
+                          std::string st_time) noexcept
 {
     // if exist
-    if (friends_set_.count(name))
+    if (check_friend_exist(name))
         return false;
-
-    friends_set_.emplace(name);
-
     auto it = std::lower_bound(friends_vec.begin(), friends_vec.end(), name);
     friends_vec.emplace(it, name);
 
-    clean_old_actions();
-    latest_10_.emplace_front(oss.str(), name);
     boxes_[name];
+    clean_old_actions();
+    latest_10_.emplace_front(std::move(st_time), name);
 
     return true;
 }
 
 bool UserInfo::unfriend(const std::string &name) noexcept
 {
-    auto _it = friends_set_.find(name);
 
     // if Not exist
-    if (_it == friends_set_.end())
+    if (!check_friend_exist(name))
         return false;
 
-    friends_set_.erase(_it);
     boxes_.erase(name);
 
     auto it = std::lower_bound(friends_vec.begin(), friends_vec.end(), name);
     if (it != friends_vec.end() && *it == name)
         friends_vec.erase(it);
 
-    for (auto it = latest_10_.begin(); it != latest_10_.end();)
-        if (it->second == name)
-            it = latest_10_.erase(it);
-        else
-            ++it;
+    latest_10_.erase(std::remove_if(latest_10_.begin(), latest_10_.end(),
+                                    [name](const std::pair<std::string, std::string> &user)
+                                    {
+                                        return user.second == name;
+                                    }),
+                     latest_10_.end());
+
+    // for (auto it = latest_10_.begin(); it != latest_10_.end();)
+    //     if (it->second == name)
+    //         it = latest_10_.erase(it);
+    //     else
+    //         ++it;
 
     return true;
 }
@@ -109,9 +108,7 @@ bool UserInfo::display_messages(const std::string &name) const noexcept
 
 bool UserInfo::verify_password(const std::string &password) const noexcept
 {
-    if (password_ != password)
-        return false;
-    return true;
+    return password_ == password;
 }
 
 void UserInfo::new_day(const std::string &name, std::ostringstream &oss, Time &time) noexcept
@@ -125,7 +122,7 @@ void UserInfo::new_day(const std::string &name, std::ostringstream &oss, Time &t
     if (new_day_)
     {
         oss << std::put_time(&time.tm, "%Y-%m-%d");
-    
+
         // Here
         boxes_.at(name).emplace_front(time.tp, oss.str());
         new_day_ = false;
@@ -136,25 +133,21 @@ void UserInfo::new_day(const std::string &name, std::ostringstream &oss, Time &t
 
 void UserInfo::add_notification(
     const time_point &tp,
-    const std::string &str) noexcept { notifications_.emplace_front(tp, str); }
+    std::string str) noexcept { notifications_.emplace_front(tp, std::move(str)); }
 
 void UserInfo::add_message(const std::string &name,
                            const time_point &tp,
-                           const std::ostringstream &oss, const std::string &str) noexcept
+                           std::string time_st,
+                           std::string message) noexcept
 {
-    boxes_.at(name).emplace_front(tp, str);
+    boxes_.at(name).emplace_front(tp, std::move(message));
 
     clean_old_actions();
-    latest_10_.emplace_front(oss.str(),name);
+    latest_10_.emplace_front(std::move(time_st), name);
 }
 
-void UserInfo::set_info(
-    const std::string &name,
-    const std::string &password) noexcept
-{
-    user_name_ = name;
-    password_ = password;
-}
+void UserInfo::set_password(
+    std::string password) noexcept { password_ = std::move(password); }
 
 void UserInfo::clean_old_actions() noexcept
 {
@@ -164,10 +157,7 @@ void UserInfo::clean_old_actions() noexcept
 void UserInfo::clear_notifications() noexcept { notifications_.clear(); }
 void UserInfo::clear_messages(const std::string &name) noexcept { boxes_.at(name).clear(); }
 
-bool UserInfo::check_if_friend_exist(const std::string &name) const noexcept
+const bool UserInfo::check_friend_exist(const std::string &name) const noexcept
 {
-    if (!friends_set_.count(name))
-        return false;
-    else
-        return true;
+    return boxes_.find(name) != boxes_.end();
 }

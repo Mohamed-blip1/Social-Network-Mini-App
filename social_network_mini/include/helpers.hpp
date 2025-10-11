@@ -14,7 +14,7 @@ struct Time
     {
         tp = system_clock::now();
         tt = system_clock::to_time_t(tp);
-        tm = *std::gmtime(&tt);
+        tm = *std::localtime(&tt);
     }
     ~Time() = default;
 };
