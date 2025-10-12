@@ -1,34 +1,41 @@
 // main.cpp
 #include "user_menu.hpp"
 
+enum class MainMenu
+{
+    Exit,
+    Login,
+    SignUp,
+    ShowMenu
+};
+
 int main()
 {
     Network network;
 
-    size_t choice = std::numeric_limits<size_t>::max();
+    MainMenu choice;
     std::string user_name;
     std::string password;
     utils::menu();
-    while (choice != 0)
+    while (true)
     {
-        choice = utils::get_valid_number_from_user();
+        choice = static_cast<MainMenu>(utils::get_valid_number_from_user());
         switch (choice)
         {
-        case 0:
-            // exit:
+        case MainMenu::Exit:
+
             std::cout << "Goodbye!\n";
             break;
 
-        case 1:
+        case MainMenu::Login:
         {
-            // Login:
             user_name = utils::get_valid_string_from_user("Enter Your Name: ");
             password = utils::get_valid_string_from_user("Enter Your Password: ");
             user_menu(network, user_name, password);
         }
         break;
-        case 2:
-            // Sign-up:
+        case MainMenu::SignUp:
+
             user_name = utils::get_valid_string_from_user("Enter Your Name: ");
             password = utils::get_valid_string_from_user("Enter Your Password: ");
 
@@ -39,13 +46,16 @@ int main()
                 std::cout << "Welcome '" << user_name << "'. Please log in to access your account.\n";
 
             break;
-        case 3:
+        case MainMenu::ShowMenu:
             utils::menu();
             break;
 
         default:
-            std::cout << "'" << choice << "' Is not a choice!\n";
+            std::cout << "'" << (size_t)choice << "' Is not a choice!\n";
+            break;
         }
+        if (choice == MainMenu::Exit)
+            break;
     }
 
     return 0;

@@ -51,8 +51,8 @@ void utils::user_menu() noexcept
     std::cout << std::setw(space) << std::left << "5" << "- Show friends\n";
     std::cout << std::setw(space) << std::left << "6" << "- Friends-of-friends suggestions\n";
     std::cout << std::setw(space) << std::left << "7" << "- Friends suggestions\n";
-    std::cout << std::setw(space) << std::left << "8" << "- recent actions\n";
-    std::cout << std::setw(space) << std::left << "9" << "- Clear Messages\n";
+    std::cout << std::setw(space) << std::left << "8" << "- Recent actions\n";
+    std::cout << std::setw(space) << std::left << "9" << "- Clear messages\n";
     std::cout << std::setw(space) << std::left << "10" << "- Clear Notifications\n";
     std::cout << std::setw(space) << std::left << "11" << "- Remove friend\n";
     std::cout << std::setw(space) << std::left << "12" << "- Menu\n";

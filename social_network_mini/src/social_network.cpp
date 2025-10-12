@@ -7,14 +7,14 @@ Network::Network() noexcept
     user_info_.max_load_factor(0.7);
 
     users_vec_.reserve(USERS_EXPECTED * GROW_BY);
-#ifdef DEBUG
-    std::string st;
-    for (size_t i = 0; i < 20; ++i)
-    {
-        st = 'a' + i;
-        sign_up(st, st);
-    }
-#endif
+// #ifdef DEBUG
+//     std::string st;
+//     for (size_t i = 0; i < 20; ++i)
+//     {
+//         st = 'a' + i;
+//         sign_up(st, st);
+//     }
+// #endif
 }
 
 Result Network::login(const std::string &name, const std::string &password) const noexcept
@@ -51,7 +51,7 @@ Result Network::add_friendship(const std::string &user, const std::string &other
         return Result::UserNotFound;
 
     auto user_it = get_user(user);
-    if (user_it->check_friend_exist(other))
+    if (user_it->friend_exist(other))
         return Result::AlreadyFriends;
 
     Time time;
@@ -134,7 +134,7 @@ bool Network::Friends_suggestions(const std::string &user) noexcept
         std::string &candidate = users_vec_[i];
         // skip if candidate is self or already a friend
         if (candidate == user ||
-            user_it->check_friend_exist(candidate))
+            user_it->friend_exist(candidate))
             continue;
 
         // show friend suggestion
@@ -280,7 +280,7 @@ bool Network::user_and_friend_exist(const std::string &user, const std::string &
     if (!user_exist(other))
         return false;
 
-    return user_info_.at(user).check_friend_exist(other);
+    return user_info_.at(user).friend_exist(other);
 }
 
 const std::string Network::notification_msg(const std::string &time_st, const std::string &name, bool choice) const noexcept

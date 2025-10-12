@@ -1,6 +1,6 @@
 # Compaler and flags
-CXX = g++
-CXXFLAGS = -Werror -Wall -std=c++17 -Iinclude
+CXX = clang++
+CXXFLAGS = -Wall -Wextra -Wpedantic -Werror -std=c++20 -Iinclude
 
 # Project name
 TARGET= main
@@ -19,8 +19,10 @@ all: release
 release: CXXFLAGS += -O3
 release: $(TARGET)
 
+g: CXX = g++
+
 # Debug
-debug: CXXFLAGS += -O0 -DDEBUG -g
+debug: CXXFLAGS += -fsanitize=address,undefined -O1 -DDEBUG -g
 debug: $(TARGET)
 
 $(TARGET): $(OBJS)
@@ -36,4 +38,4 @@ clean:
 run: $(TARGET)
 	./$(TARGET)
 
-.PHONY: clean debug all run release
+.PHONY: clean debug all run release g

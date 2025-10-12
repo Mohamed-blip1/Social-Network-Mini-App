@@ -18,12 +18,12 @@ bool UserInfo::add_friend(const std::string &name,
                           std::string st_time) noexcept
 {
     // if exist
-    if (check_friend_exist(name))
+    if (friend_exist(name))
         return false;
     auto it = std::lower_bound(friends_vec.begin(), friends_vec.end(), name);
     friends_vec.emplace(it, name);
 
-    boxes_[name];
+    boxes_.try_emplace(name);
     clean_old_actions();
     latest_10_.emplace_front(std::move(st_time), name);
 
@@ -34,7 +34,7 @@ bool UserInfo::unfriend(const std::string &name) noexcept
 {
 
     // if Not exist
-    if (!check_friend_exist(name))
+    if (!friend_exist(name))
         return false;
 
     boxes_.erase(name);
@@ -95,12 +95,12 @@ bool UserInfo::display_notifications() const noexcept
 
 bool UserInfo::display_messages(const std::string &name) const noexcept
 {
-    // Check if friend exist
-    // Before
-    if (boxes_.at(name).empty())
+    auto chat_it = get_friend_chat(name);
+    // if friend not exist or chat empty
+    if (!chat_it || chat_it->empty())
         return false;
 
-    for (auto it = boxes_.at(name).rbegin(); it != boxes_.at(name).rend(); ++it)
+    for (auto it = chat_it->rbegin(); it != chat_it->rend(); ++it)
         std::cout << "- " << it->content << "\n";
 
     return true;
@@ -111,24 +111,29 @@ bool UserInfo::verify_password(const std::string &password) const noexcept
     return password_ == password;
 }
 
-void UserInfo::new_day(const std::string &name, std::ostringstream &oss, Time &time) noexcept
+bool UserInfo::new_day(const std::string &name, std::ostringstream &oss, Time &time) noexcept
 {
     auto duration = std::chrono::duration_cast<std::chrono::hours>(time.tp - day_check);
-    // Check
-    // Before if friend exist
-    if (duration >= std::chrono::hours(DAY) || boxes_.at(name).empty())
+
+    auto chat_it = get_friend_chat(name);
+    // if friend not exist
+    if (!chat_it)
+        return false;
+
+    if (duration >= std::chrono::hours(DAY) || chat_it->empty())
         new_day_ = true;
 
     if (new_day_)
     {
         oss << std::put_time(&time.tm, "%Y-%m-%d");
 
-        // Here
-        boxes_.at(name).emplace_front(time.tp, oss.str());
+        // Here ?
+        chat_it->emplace_front(time.tp, oss.str());
         new_day_ = false;
         oss.str("");
         oss.clear();
     }
+    return true;
 }
 
 void UserInfo::add_notification(
@@ -157,7 +162,18 @@ void UserInfo::clean_old_actions() noexcept
 void UserInfo::clear_notifications() noexcept { notifications_.clear(); }
 void UserInfo::clear_messages(const std::string &name) noexcept { boxes_.at(name).clear(); }
 
-const bool UserInfo::check_friend_exist(const std::string &name) const noexcept
+bool UserInfo::friend_exist(const std::string &name) const noexcept
 {
     return boxes_.find(name) != boxes_.end();
+}
+
+std::deque<MessagesInfo> *UserInfo::get_friend_chat(const std::string &name) noexcept
+{
+    auto it = boxes_.find(name);
+    return (it != boxes_.end()) ? &it->second : nullptr;
+}
+const std::deque<MessagesInfo> *UserInfo::get_friend_chat(const std::string &name) const noexcept
+{
+    auto it = boxes_.find(name);
+    return (it != boxes_.end()) ? &it->second : nullptr;
 }

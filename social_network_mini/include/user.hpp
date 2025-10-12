@@ -42,7 +42,7 @@ public:
 
     bool verify_password(const std::string &password) const noexcept;
 
-    void new_day(const std::string &name, std::ostringstream &oss, Time &time) noexcept;
+    bool new_day(const std::string &name, std::ostringstream &oss, Time &time) noexcept;
 
     void add_notification(const time_point &tp, std::string str) noexcept;
     void add_message(const std::string &name,
@@ -59,7 +59,9 @@ public:
     const std::vector<std::string> &
     get_friends_vec() const noexcept { return friends_vec; }
 
-    const bool check_friend_exist(const std::string &name) const noexcept;
+    bool friend_exist(const std::string &name) const noexcept;
+    std::deque<MessagesInfo> *get_friend_chat(const std::string &name) noexcept;
+    const std::deque<MessagesInfo> *get_friend_chat(const std::string &name) const noexcept;
 
 private:
     std::string user_name_;

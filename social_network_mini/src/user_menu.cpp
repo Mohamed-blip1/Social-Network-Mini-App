@@ -1,6 +1,23 @@
 // user_menu.cpp
 #include "user_menu.hpp"
 
+enum class UserMenu
+{
+    Logout,
+    AddFriend,
+    RecentMessages,
+    SendMessage,
+    Notifications,
+    ShowFriends,
+    FriendsOfSriendsSuggestions,
+    FriendsSuggestions,
+    RecentActions,
+    ClearMessages,
+    ClearNotifications,
+    RemoveFriend,
+    Menu,
+};
+
 void user_menu(Network &network, const std::string &user_name, const std::string &password)
 {
     switch (network.login(user_name, password))
@@ -19,19 +36,19 @@ void user_menu(Network &network, const std::string &user_name, const std::string
     }
 
     // user space.
-    size_t choice = std::numeric_limits<size_t>::max();
+    UserMenu choice;
     utils::user_menu();
-    while (choice != 0)
+    while (true)
     {
-        choice = utils::get_valid_number_from_user();
+        choice = static_cast<UserMenu>(utils::get_valid_number_from_user());
         switch (choice)
         {
-        case 0:
-            // logout
+        case UserMenu::Logout:
+
             std::cout << "Goodbye!\n";
             break;
 
-        case 1:
+        case UserMenu::AddFriend:
         {
             std::string other = utils::get_valid_string_from_user("Enter a Name: ");
 
@@ -52,7 +69,7 @@ void user_menu(Network &network, const std::string &user_name, const std::string
         }
         break;
 
-        case 2:
+        case UserMenu::RecentMessages:
         {
             std::string other = utils::get_valid_string_from_user("Enter a friend Name: ");
             if (!network.user_and_friend_exist(user_name, other))
@@ -66,7 +83,7 @@ void user_menu(Network &network, const std::string &user_name, const std::string
         }
         break;
 
-        case 3:
+        case UserMenu::SendMessage:
         {
             std::string other = utils::get_valid_string_from_user("Enter a Name: ");
 
@@ -93,35 +110,35 @@ void user_menu(Network &network, const std::string &user_name, const std::string
         }
         break;
 
-        case 4:
+        case UserMenu::Notifications:
             std::cout << "Notifications:\n";
             if (!network.notifications(user_name))
                 std::cout << "Empty notifications!\n";
             break;
 
-        case 5:
+        case UserMenu::ShowFriends:
             std::cout << "Friends:\n";
             if (!network.show_friends(user_name))
                 std::cout << "No friends yet!\n";
             break;
-        case 6:
+        case UserMenu::FriendsOfSriendsSuggestions:
             std::cout << "Friends of Friends:\n";
             if (!network.bfs(user_name))
                 std::cout << "No friends-of-friends yet!\n";
             break;
-        case 7:
+        case UserMenu::FriendsSuggestions:
             std::cout << "Friends suggestions:\n";
             if (!network.Friends_suggestions(user_name))
                 std::cout << "There are no friend suggestions!\n";
             break;
 
-        case 8:
+        case UserMenu::RecentActions:
             std::cout << "Recent actions:\n";
             if (!network.recent_actions(user_name))
                 std::cout << "No recent actions!\n";
             break;
 
-        case 9:
+        case UserMenu::ClearMessages:
         {
             std::string other =
                 utils::get_valid_string_from_user("Enter a name: ");
@@ -137,12 +154,12 @@ void user_menu(Network &network, const std::string &user_name, const std::string
         }
         break;
 
-        case 10:
+        case UserMenu::ClearNotifications:
             network.clear_notifications(user_name);
             std::cout << "Notifications have been cleared!\n";
             break;
 
-        case 11:
+        case UserMenu::RemoveFriend:
         {
             std::string other = utils::get_valid_string_from_user("Enter a Name: ");
 
@@ -165,12 +182,15 @@ void user_menu(Network &network, const std::string &user_name, const std::string
             }
         }
         break;
-        case 12:
+        case UserMenu::Menu:
             utils::user_menu();
             break;
 
         default:
-            std::cout << "'" << choice << "' Is not a choice!\n";
+            std::cout << "'" << (size_t)choice << "' Is not a choice!\n";
+            break;
         }
+        if (choice == UserMenu::Logout)
+            break;
     }
 }
