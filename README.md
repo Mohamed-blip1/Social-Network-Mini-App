@@ -50,7 +50,7 @@ A terminal or shell (Linux, macOS, Windows with MSYS2)
 ## ✅ Option 1: Using make
 - Navigate to project folder
 ```
-cd /home/your_path/cpp-Social-Network/social_network_mini
+cd /home/your_path/cpp-Social-Network/
 ```
 - Compile
 ```
