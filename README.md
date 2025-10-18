@@ -20,21 +20,20 @@ It allows users to sign up, log in, post messages, and interact with each other 
 cpp-Social-Network/
 ├── .gitignore
 ├── README.md                 # This file
-└── social_network_mini/
-    ├── include/              # Header files
-    │   ├── user.h            # User class
-    │   ├── user_menu.h       # User interface logic
-    │   ├── social_network.h  # Core logic
-    │   └── utils.h           # Utilities
+├── include/              # Header files
+│   ├── user.h            # User class
+│   ├── user_menu.h       # User interface logic
+│   ├── social_network.h  # Core logic
+│   └── utils.h           # Utilities
 
-    ├── src/                  # Source files
-    |   ├── main.cpp              # Program entry point
-    │   ├── user.cpp
-    │   ├── user_menu.cpp
-    │   ├── social_network.cpp
-    │   └── utils.cpp
+├── src/                  # Source files
+|   ├── main.cpp              # Program entry point
+│   ├── user.cpp
+│   ├── user_menu.cpp
+│   ├── social_network.cpp
+│   └── utils.cpp
 
-    └── Makefile              # Build configuration
+└── Makefile              # Build configuration
 ```
 
 # ⚙️ Build Instructions
