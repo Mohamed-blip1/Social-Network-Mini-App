@@ -1,6 +1,10 @@
 // utils.cpp
 #include "utils.hpp"
 
+// STL:
+#include <iostream>
+#include <iomanip>
+
 std::string trim(const std::string &str, char target)
 {
     size_t start = str.find_first_not_of(target);

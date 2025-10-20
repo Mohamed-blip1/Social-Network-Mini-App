@@ -1,17 +1,22 @@
 #pragma once
-// user.hpp
-#include <unordered_map>
-#include <unordered_set>
-#include "helpers.hpp"
-#include <vector>
-#include <deque>
-#include <algorithm>
 
-constexpr size_t expected_friends_number = 25;
+// user.hpp
+
+#include "helpers.hpp"
+
+// STL:
+#include <unordered_map>
+#include <cstddef>
+#include <vector>
+#include <chrono>
+#include <string>
+#include <deque>
+
+constexpr std::size_t expected_friends_number = 25;
 constexpr float grow_by = 1.5;
 
-constexpr size_t MAX_RECENT = 10; // Recent action
-constexpr size_t DAY = 24;        // Hour
+constexpr std::size_t MAX_RECENT = 10; // Recent action
+constexpr std::size_t DAY = 24;        // Hour
 
 class UserInfo
 {

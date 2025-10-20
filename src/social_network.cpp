@@ -1,5 +1,14 @@
 // social_network.cpp
+
 #include "social_network.hpp"
+
+// STL:
+#include <algorithm>
+#include <utility>
+#include <sstream>
+#include <iomanip>
+#include <iostream>
+#include <random>
 
 Network::Network() noexcept
 {
@@ -7,14 +16,15 @@ Network::Network() noexcept
     user_info_.max_load_factor(0.7);
 
     users_vec_.reserve(USERS_EXPECTED * GROW_BY);
-// #ifdef DEBUG
-//     std::string st;
-//     for (size_t i = 0; i < 20; ++i)
-//     {
-//         st = 'a' + i;
-//         sign_up(st, st);
-//     }
-// #endif
+
+#ifdef DEBUG
+    std::string st;
+    for (std::size_t i = 0; i < 20; ++i)
+    {
+        st = 'a' + i;
+        sign_up(st, st);
+    }
+#endif
 }
 
 Result Network::login(const std::string &name, const std::string &password) const noexcept
@@ -119,7 +129,7 @@ void Network::send_message(const std::string &user, const std::string &other, co
 // suggest 10 friend then shuffle the first 10 elements of the vector
 bool Network::Friends_suggestions(const std::string &user) noexcept
 {
-    const size_t _size = users_vec_.size();
+    const std::size_t _size = users_vec_.size();
 
     // there is only 1 user
     if (_size <= ONE_USER)
@@ -128,8 +138,8 @@ bool Network::Friends_suggestions(const std::string &user) noexcept
     limited_shuffle(_size);
     auto user_it = get_user(user);
 
-    size_t n = 1;
-    for (size_t i = 0; i < _size && n < DISPLAY_LIMITS; ++i)
+    std::size_t n = 1;
+    for (std::size_t i = 0; i < _size && n < DISPLAY_LIMITS; ++i)
     {
         std::string &candidate = users_vec_[i];
         // skip if candidate is self or already a friend
@@ -150,18 +160,18 @@ bool Network::bfs(const std::string &user) noexcept
     bfs_.clear();
 
     const auto &user_friends = user_info_.at(user).get_friends_vec();
-    const size_t &_size = user_friends.size();
+    const std::size_t &_size = user_friends.size();
 
     if (user_friends.empty())
         return false;
 
     const std::string *name;
-    for (size_t i = 0; i < _size; ++i)
+    for (std::size_t i = 0; i < _size; ++i)
     {
         const auto &friends_of_friend = user_info_.at(user_friends[i]).get_friends_vec();
 
-        size_t max = 0;
-        for (size_t j = 0; j < friends_of_friend.size(); ++j)
+        std::size_t max = 0;
+        for (std::size_t j = 0; j < friends_of_friend.size(); ++j)
         {
             name = &friends_of_friend[j];
 
@@ -206,14 +216,14 @@ bool Network::notifications(const std::string &user) const noexcept
 }
 
 // splited Fisher-Yates shuffle only for first 10 slots
-void Network::limited_shuffle(size_t _max) noexcept
+void Network::limited_shuffle(std::size_t _max) noexcept
 {
     // Later: only shuffle non-friends that are candidates.
     std::mt19937 gen(std::random_device{}());
 
-    for (size_t i = 0, limits = std::min<size_t>(LIMITS, _max); i < limits; ++i)
+    for (std::size_t i = 0, limits = std::min<std::size_t>(LIMITS, _max); i < limits; ++i)
         std::swap(users_vec_[i],
-                  users_vec_[std::uniform_int_distribution<size_t>(i, _max - 1)(gen)]);
+                  users_vec_[std::uniform_int_distribution<std::size_t>(i, _max - 1)(gen)]);
 }
 
 bool Network::filter(const std::vector<std::string> &user_friends,
@@ -246,6 +256,12 @@ bool Network::change_password(const std::string &user, std::string new_pass) noe
     user_it->set_password(std::move(new_pass));
     return true;
 }
+
+void Network::clear_notifications(
+    const std::string &user) noexcept { user_info_.at(user).clear_notifications(); }
+void Network::clear_messages(
+    const std::string &user,
+    const std::string &name) noexcept { user_info_.at(user).clear_messages(name); }
 
 bool Network::show_bfs() const noexcept
 {

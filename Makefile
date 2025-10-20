@@ -1,6 +1,9 @@
+# Makefile
+
 # Compaler and flags
 CXX = clang++
 CXXFLAGS = -Wall -Wextra -Wpedantic -Werror -std=c++20 -Iinclude
+CXXFLAGS += -include pch.hpp
 
 # Project name
 TARGET= main
@@ -16,10 +19,12 @@ OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 # Default
 all: release
 
-release: CXXFLAGS += -O3
+
+release: CXXFLAGS += -O2
 release: $(TARGET)
 
 g: CXX = g++
+g:all
 
 # Debug
 debug: CXXFLAGS += -fsanitize=address,undefined -O1 -DDEBUG -g
@@ -28,9 +33,11 @@ debug: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	mkdir -p $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | build
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+build: 
+	mkdir -p $(OBJ_DIR) 
 
 clean:
 	rm -rf $(OBJ_DIR) $(TARGET)

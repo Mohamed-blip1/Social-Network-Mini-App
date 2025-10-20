@@ -1,8 +1,10 @@
 #pragma once
+
 // utils.hpp
-#include <iostream>
-#include <iomanip>
-#include <algorithm>
+
+// STL:
+#include <string>
+#include <cstddef>
 
 std::string trim(const std::string &str, char target = ' ');
 

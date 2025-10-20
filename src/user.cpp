@@ -1,7 +1,13 @@
 // user.cpp
 #include "user.hpp"
+
+// STL:
+#include <algorithm>
 #include <iostream>
+#include <sstream>
 #include <iomanip>
+#include <utility>
+#include <string>
 
 UserInfo::UserInfo(std::string pass) noexcept
     : password_(std::move(pass))

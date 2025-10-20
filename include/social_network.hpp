@@ -1,18 +1,26 @@
 #pragma once
-// Social_Network.hpp
-#include <random>
-#include <iomanip>
-#include "user.hpp"
-#include <chrono>
 
-constexpr size_t USERS_EXPECTED = 100;
+// Social_Network.hpp
+
+#include "user.hpp"
+
+// STL:
+#include <unordered_map>
+#include <cstddef>
+#include <chrono>
+#include <string>
+#include <vector>
+#include <deque>
+
+
+constexpr std::size_t USERS_EXPECTED = 100;
 constexpr float GROW_BY = 1.5;
-constexpr size_t SPACE = 3;
-constexpr size_t DISPLAY_LIMITS = 10;
-constexpr size_t ONE_USER = 1;
-constexpr size_t _0_FRIENDS_DISPLAYED = 1;
-constexpr size_t LIMITS_TAKING = 4;
-constexpr size_t LIMITS = 10;
+constexpr std::size_t SPACE = 3;
+constexpr std::size_t DISPLAY_LIMITS = 10;
+constexpr std::size_t ONE_USER = 1;
+constexpr std::size_t _0_FRIENDS_DISPLAYED = 1;
+constexpr std::size_t LIMITS_TAKING = 4;
+constexpr std::size_t LIMITS = 10;
 constexpr bool UnfriendMsg = 0;
 constexpr bool AdFriendMsg = 1;
 
@@ -64,18 +72,13 @@ public:
     bool recent_actions(const std::string &user) const noexcept;
     bool notifications(const std::string &user) const noexcept;
 
-    bool change_password(const std::string &name,
-                         std::string new_pass) noexcept;
+    bool change_password(const std::string &name, std::string new_pass) noexcept;
 
-    void clear_notifications(
-        const std::string &user) noexcept { user_info_.at(user).clear_notifications(); }
-    void clear_messages(
-        const std::string &user,
-        const std::string &name) noexcept { user_info_.at(user).clear_messages(name); }
+    void clear_notifications(const std::string &user) noexcept;
+    void clear_messages(const std::string &user, const std::string &name) noexcept;
 
     // befor send message
-     bool user_and_friend_exist(const std::string &user,
-                                      const std::string &other) const noexcept;
+    bool user_and_friend_exist(const std::string &user, const std::string &other) const noexcept;
     inline bool user_exist(const std::string &name) const noexcept;
 
     inline UserInfo *get_user(const std::string &name) noexcept;
@@ -83,14 +86,15 @@ public:
 
 private:
     // splited Fisher-Yates shuffle only for first 10 slots
-    void limited_shuffle(size_t _max) noexcept;
+    void limited_shuffle(std::size_t _max) noexcept;
 
     bool filter(const std::vector<std::string> &user_friends,
                 const std::string &user, const std::string &target) const noexcept;
 
     bool show_bfs() const noexcept;
 
-    const std::string notification_msg(const std::string &time_st, const std::string &name, bool choice = AdFriendMsg) const noexcept;
+    const std::string notification_msg(const std::string &time_st, const std::string &name,
+                                       bool choice = AdFriendMsg) const noexcept;
 
 private:
     std::unordered_map<std::string, UserInfo> user_info_;

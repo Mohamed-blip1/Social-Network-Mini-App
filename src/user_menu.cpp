@@ -1,5 +1,13 @@
 // user_menu.cpp
+
+#include "social_network.hpp"
 #include "user_menu.hpp"
+#include "utils.hpp"
+
+// STL:
+#include <iostream>
+#include <cstddef>
+#include <string>
 
 enum class UserMenu
 {
@@ -187,7 +195,7 @@ void user_menu(Network &network, const std::string &user_name, const std::string
             break;
 
         default:
-            std::cout << "'" << (size_t)choice << "' Is not a choice!\n";
+            std::cout << "'" << (std::size_t)choice << "' Is not a choice!\n";
             break;
         }
         if (choice == UserMenu::Logout)
