@@ -18,28 +18,28 @@ It allows users to sign up, log in, post messages, and interact with each other 
 ## 📁 Project Structure
 ```
 cpp-Social-Network/
-├── .gitignore
-├── README.md                 # This file
-├── include/              # Header files
-│   ├── user.h            # User class
-│   ├── user_menu.h       # User interface logic
-│   ├── social_network.h  # Core logic
-│   └── utils.h           # Utilities
-
-├── src/                  # Source files
-|   ├── main.cpp              # Program entry point
-│   ├── user.cpp
-│   ├── user_menu.cpp
-│   ├── social_network.cpp
-│   └── utils.cpp
-
-└── Makefile              # Build configuration
+├─ include/
+│ ├─ helpers.hpp
+│ ├─ user.hpp
+│ ├─ social_network.hpp
+│ ├─ user_menu.hpp
+│ └─ utils.hpp
+├─ src/
+│ ├─ main.cpp
+│ ├─ social_network.cpp
+│ ├─ user.cpp
+│ ├─ user_menu.cpp
+│ └─ utils.cpp
+├─ pch.hpp
+├─ Makefile
+├─ README.md
+└─ .gitignore
 ```
 
 # ⚙️ Build Instructions
 ## 🛠 Prerequisites
 
-A C++17 compiler (g++, clang++, or MSVC)
+A C++20 compiler (g++, clang++, or MSVC)
 
 Make
  (optional, for using the Makefile)
@@ -55,6 +55,9 @@ cd /home/your_path/cpp-Social-Network/
 - Compile
 ```
 make
+make g  # For g++
+make debug # For debuging
+make run # To build and run
 ```
 # Run
 ```
@@ -63,7 +66,7 @@ make
 ```
 ## ⚙️ Option 2: Manual compilation
 ```
-g++ -std=c++17 -Iinclude -Isrc src/*.cpp -o main.exe
+g++ -std=c++20 -Iinclude -include pch.hpp -Isrc src/*.cpp -o main.exe
 ./main      # Linux/macOS
 ./main.exe  # Windows
 ```
