@@ -12,10 +12,10 @@
 UserInfo::UserInfo(std::string pass) noexcept
     : password_(std::move(pass))
 {
-    boxes_.rehash(expected_friends_number * grow_by);
-    boxes_.max_load_factor(0.7);
+    boxes_.rehash(static_cast<std::size_t>(expected_friends_number * grow_by));
+    boxes_.max_load_factor(0.7f);
 
-    friends_vec.reserve(expected_friends_number * grow_by);
+    friends_vec.reserve(static_cast<std::size_t>(expected_friends_number * grow_by));
     day_check = system_clock::now();
     new_day_ = true;
 }

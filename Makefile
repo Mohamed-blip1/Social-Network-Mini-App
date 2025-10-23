@@ -2,8 +2,9 @@
 
 # Compaler and flags
 CXX = clang++
-CXXFLAGS = -Wall -Wextra -Wpedantic -Werror -std=c++20 -Iinclude
-CXXFLAGS += -include pch.hpp
+CXXFLAGS = -Weffc++ -Wconversion -Wsign-conversion -Wall -Wextra -Wpedantic -Werror -pedantic-errors
+CXXFLAGS += -std=c++20 -Iinclude
+CXXFLAGS +=  -include pch.hpp
 
 # Project name
 TARGET= main

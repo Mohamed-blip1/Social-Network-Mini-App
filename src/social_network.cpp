@@ -12,10 +12,10 @@
 
 Network::Network() noexcept
 {
-    user_info_.rehash(USERS_EXPECTED * GROW_BY);
-    user_info_.max_load_factor(0.7);
-
-    users_vec_.reserve(USERS_EXPECTED * GROW_BY);
+    user_info_.rehash(static_cast<std::size_t>(USERS_EXPECTED * GROW_BY));
+    user_info_.max_load_factor(0.7f);
+    
+    users_vec_.reserve(static_cast<std::size_t>(USERS_EXPECTED * GROW_BY));
 
 #ifdef DEBUG
     std::string st;

@@ -48,7 +48,7 @@ CMakeCache.txt
 cmake_install.cmake
 build/
 *.json
-*social_network_mini/main
+*main
 
 # Log / temp files
 *.log
