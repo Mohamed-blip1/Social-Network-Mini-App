@@ -10,14 +10,18 @@
 #include <string>
 
 UserInfo::UserInfo(std::string pass) noexcept
-    : password_(std::move(pass))
+    : password_(std::move(pass)),
+      boxes_(),
+      friends_vec_(),
+      latest_10_(),
+      notifications_(),
+      day_check(system_clock::now()),
+      new_day_(true)
 {
     boxes_.rehash(static_cast<std::size_t>(expected_friends_number * grow_by));
     boxes_.max_load_factor(0.7f);
 
-    friends_vec.reserve(static_cast<std::size_t>(expected_friends_number * grow_by));
-    day_check = system_clock::now();
-    new_day_ = true;
+    friends_vec_.reserve(static_cast<std::size_t>(expected_friends_number * grow_by));
 }
 
 bool UserInfo::add_friend(const std::string &name,
@@ -26,8 +30,8 @@ bool UserInfo::add_friend(const std::string &name,
     // if exist
     if (friend_exist(name))
         return false;
-    auto it = std::lower_bound(friends_vec.begin(), friends_vec.end(), name);
-    friends_vec.emplace(it, name);
+    auto it = std::lower_bound(friends_vec_.begin(), friends_vec_.end(), name);
+    friends_vec_.emplace(it, name);
 
     boxes_.try_emplace(name);
     clean_old_actions();
@@ -45,9 +49,9 @@ bool UserInfo::unfriend(const std::string &name) noexcept
 
     boxes_.erase(name);
 
-    auto it = std::lower_bound(friends_vec.begin(), friends_vec.end(), name);
-    if (it != friends_vec.end() && *it == name)
-        friends_vec.erase(it);
+    auto it = std::lower_bound(friends_vec_.begin(), friends_vec_.end(), name);
+    if (it != friends_vec_.end() && *it == name)
+        friends_vec_.erase(it);
 
     latest_10_.erase(std::remove_if(latest_10_.begin(), latest_10_.end(),
                                     [name](const std::pair<std::string, std::string> &user)
@@ -67,10 +71,10 @@ bool UserInfo::unfriend(const std::string &name) noexcept
 
 bool UserInfo::display_friends() const noexcept
 {
-    if (friends_vec.empty())
+    if (friends_vec_.empty())
         return false;
 
-    for (const auto &friends : friends_vec)
+    for (const auto &friends : friends_vec_)
         std::cout << "- " << friends << "\n";
 
     return true;

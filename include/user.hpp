@@ -62,17 +62,16 @@ public:
     void clear_messages(const std::string &name) noexcept;
 
     const std::vector<std::string> &
-    get_friends_vec() const noexcept { return friends_vec; }
+    get_friends_vec() const noexcept { return friends_vec_; }
 
     bool friend_exist(const std::string &name) const noexcept;
     std::deque<MessagesInfo> *get_friend_chat(const std::string &name) noexcept;
     const std::deque<MessagesInfo> *get_friend_chat(const std::string &name) const noexcept;
 
 private:
-    std::string user_name_;
     std::string password_;
     std::unordered_map<std::string, std::deque<MessagesInfo>> boxes_;
-    std::vector<std::string> friends_vec;
+    std::vector<std::string> friends_vec_;
     std::deque<std::pair<std::string, std::string>> latest_10_;
     std::deque<MessagesInfo> notifications_;
     system_clock::time_point day_check;

@@ -7,15 +7,14 @@
 struct Time
 {
     using system_clock = std::chrono::system_clock;
-    system_clock::time_point tp;
-    std::time_t tt;
-    std::tm tm;
+    system_clock::time_point tp{};
+    std::time_t tt{};
+    std::tm tm{};
 
-    Time()
+    Time() : tp(system_clock::now()),
+             tt(system_clock::to_time_t(tp)),
+             tm(*std::localtime(&tt))
     {
-        tp = system_clock::now();
-        tt = system_clock::to_time_t(tp);
-        tm = *std::localtime(&tt);
     }
     ~Time() = default;
 };

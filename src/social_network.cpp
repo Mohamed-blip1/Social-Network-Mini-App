@@ -11,10 +11,13 @@
 #include <random>
 
 Network::Network() noexcept
+    : user_info_(),
+      users_vec_(),
+      bfs_()
 {
     user_info_.rehash(static_cast<std::size_t>(USERS_EXPECTED * GROW_BY));
     user_info_.max_load_factor(0.7f);
-    
+
     users_vec_.reserve(static_cast<std::size_t>(USERS_EXPECTED * GROW_BY));
 
 #ifdef DEBUG

@@ -2,8 +2,8 @@
 
 # Compaler and flags
 CXX = clang++
-CXXFLAGS = -Weffc++ -Wconversion -Wsign-conversion -Wall -Wextra -Wpedantic -Werror -pedantic-errors
-CXXFLAGS += -std=c++20 -Iinclude
+CXXFLAGS = -Weffc++ -Wconversion -Wsign-conversion -Wall -Wextra -Wpedantic -Werror 
+CXXFLAGS += -std=c++20 -Iinclude 
 CXXFLAGS +=  -include pch.hpp
 
 # Project name
@@ -25,6 +25,7 @@ release: CXXFLAGS += -O2
 release: $(TARGET)
 
 g: CXX = g++
+# g: CXXFLAGS = -std=c++20 -Iinclude -include pch.hpp
 g:all
 
 # Debug
